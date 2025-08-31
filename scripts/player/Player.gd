@@ -13,6 +13,7 @@ signal ability_used(ability_name)
 @onready var camera_arm: Node3D = $CameraArm
 @onready var visual_effects: Node3D = $VisualEffects
 @onready var audio: AudioStreamPlayer3D = $Audio
+@onready var attack_system: Node = $AttackSystem
 
 # Stats base do jogador (conectados com GameManager)
 var max_health: float = 100.0
@@ -22,9 +23,11 @@ var dash_speed: float = 20.0
 var dash_duration: float = 0.3
 var dash_cooldown: float = 1.5
 
-# Estados de movimento
+# Estados de movimento e combate
 var is_dashing: bool = false
 var is_stunned: bool = false
+var is_attacking: bool = false
+var movement_modifier: float = 1.0  # For attack slowdown
 var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 
@@ -117,12 +120,14 @@ func handle_movement_input(delta):
 	if input_vector.length() > 0:
 		input_vector = input_vector.normalized()
 		
-		# Apply movement
-		velocity.x = input_vector.x * movement_speed
-		velocity.z = input_vector.z * movement_speed
+		# Apply movement with modifier (attacks slow you down)
+		var final_speed = movement_speed * movement_modifier
+		velocity.x = input_vector.x * final_speed
+		velocity.z = input_vector.z * final_speed
 		
-		# Rotate player to face movement direction
-		look_at(global_position + input_vector, Vector3.UP)
+		# Rotate player to face movement direction (only when not attacking)
+		if not is_attacking:
+			look_at(global_position + input_vector, Vector3.UP)
 	else:
 		# Friction when not moving
 		velocity.x = move_toward(velocity.x, 0, movement_speed * 3 * delta)
@@ -221,24 +226,40 @@ func _on_health_changed(new_health: float, max_health: float):
 		GameManager.player_stats.current_health = new_health
 		GameManager.player_stats.max_health = max_health
 
+func set_movement_modifier(modifier: float):
+	"""Define modificador de velocidade (usado pelo sistema de ataque)"""
+	movement_modifier = modifier
+	
+	if modifier < 1.0:
+		is_attacking = true
+	else:
+		is_attacking = false
+
 func get_movement_info() -> Dictionary:
 	"""Retorna informações de movimento para debug"""
+	var attack_info = {}
+	if attack_system and attack_system.has_method("get_attack_info"):
+		attack_info = attack_system.get_attack_info()
+	
 	return {
 		"position": global_position,
 		"velocity": velocity,
 		"speed": velocity.length(),
 		"is_dashing": is_dashing,
+		"is_attacking": is_attacking,
 		"is_on_floor": is_on_floor(),
 		"health": current_health,
-		"dash_cooldown": dash_cooldown_timer
+		"dash_cooldown": dash_cooldown_timer,
+		"attack_info": attack_info
 	}
 
 # Input handling para abilities (implementadas nos próximos sprints)
 func _input(event):
 	"""Handle input events"""
 	if event.is_action_pressed("attack"):
-		# TODO: Implement basic attack in Sprint 3
-		print("⚔️  Basic attack - Coming in Sprint 3")
+		# Perform basic attack with Was Scepter
+		if attack_system and attack_system.has_method("perform_basic_attack"):
+			attack_system.perform_basic_attack()
 	
 	if event.is_action_pressed("ability_1"):
 		# TODO: Implement abilities in Sprint 4  

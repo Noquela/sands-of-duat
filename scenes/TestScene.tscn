@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://cjf4v8vuwngsp"]
+[gd_scene load_steps=7 format=3 uid="uid://cjf4v8vuwngsp"]
 
 [ext_resource type="Script" uid="uid://ok6tkwd3swpm" path="res://scripts/core/TestSceneController.gd" id="1_0j2xk"]
 [ext_resource type="PackedScene" uid="uid://cmcqh1osjxjfn" path="res://scenes/player/Player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://scripts/camera/IsometricCamera.gd" id="3_camera"]
+[ext_resource type="Script" uid="uid://cgs730eangs4s" path="res://scripts/camera/IsometricCamera.gd" id="3_camera"]
+[ext_resource type="PackedScene" uid="uid://bfgm6ik2wemgp" path="res://scenes/enemies/BasicEnemy.tscn" id="4_enemy"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1nvkq"]
 size = Vector3(20, 0.2, 20)
@@ -42,8 +43,19 @@ mesh = SubResource("BoxMesh_1nvkq")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
 
-[node name="Player" parent="." instance=ExtResource("2_player") groups=["player"]]
+[node name="Player" parent="." groups=["player"] instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="Enemy1" parent="Enemies" instance=ExtResource("4_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 0)
+
+[node name="Enemy2" parent="Enemies" instance=ExtResource("4_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, 4)
+
+[node name="Enemy3" parent="Enemies" instance=ExtResource("4_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, -6)
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -59,9 +71,10 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
-text = "🏛️ SANDS OF DUAT - Sprint 2 Player Controller
+text = "🏛️ SANDS OF DUAT - Sprint 3 Combat System
 FPS: 
 Movement: WASD + Space (dash)
+Combat: Left Click (Was Scepter attack)
 Camera: Smart follow with look-ahead
 Press ESC for debug info"
 
