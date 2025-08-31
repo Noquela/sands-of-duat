@@ -210,8 +210,8 @@ func handle_patrol_state(_delta):
 		patrol_wait_timer = randf_range(1.0, 2.0)
 		change_state(EnemyState.IDLE)
 	
-	# Face movement direction
-	if direction.length() > 0:
+	# Face movement direction (reduce frequency)
+	if direction.length() > 0 and randf() < 0.1:  # Only 10% of frames
 		look_at(global_position + direction, Vector3.UP)
 
 func handle_chase_state(_delta):
@@ -227,8 +227,8 @@ func handle_chase_state(_delta):
 	velocity.x = direction.x * movement_speed
 	velocity.z = direction.z * movement_speed
 	
-	# Face player
-	if direction.length() > 0:
+	# Face player (reduce frequency)
+	if direction.length() > 0 and randf() < 0.2:  # Only 20% of frames
 		look_at(target_player.global_position, Vector3.UP)
 	
 	# Check distance to player

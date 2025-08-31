@@ -242,10 +242,10 @@ func perform_projectile_shot(ability: Dictionary):
 	"""Projectile Shot: Ranged divine bolt"""
 	print("🔮 Sacred Bolt fired!")
 	
-	# Create projectile
-	var projectile = preload("res://scripts/enemies/Projectile.gd").new()
+	# Create projectile with script
+	var projectile_scene = preload("res://scripts/combat/Projectile.gd")
 	var projectile_body = RigidBody3D.new()
-	projectile_body.set_script(projectile)
+	projectile_body.set_script(projectile_scene)
 	
 	# Setup projectile visual
 	var mesh_inst = MeshInstance3D.new()
@@ -258,6 +258,7 @@ func perform_projectile_shot(ability: Dictionary):
 	material.albedo_color = Color.GOLD
 	material.emission_enabled = true
 	material.emission = Color.YELLOW
+	material.emission_energy = 1.0
 	mesh_inst.material_override = material
 	
 	projectile_body.add_child(mesh_inst)
@@ -269,17 +270,17 @@ func perform_projectile_shot(ability: Dictionary):
 	collision.shape = shape
 	projectile_body.add_child(collision)
 	
-	# Position and launch
-	projectile_body.global_position = player.global_position + Vector3.UP * 1.5
-	
-	# Get direction (toward mouse cursor or forward)
-	var direction = get_projectile_direction()
-	projectile_body.velocity = direction * 15.0  # Fast projectile
-	
-	# Set damage
-	projectile_body.set_damage(ability.damage)
-	
+	# Add to scene first
 	get_tree().current_scene.add_child(projectile_body)
+	
+	# Position and configure
+	projectile_body.global_position = player.global_position + Vector3.UP * 1.5
+	projectile_body.set_damage(ability.damage)
+	projectile_body.set_projectile_owner(player)
+	
+	# Get direction and launch
+	var direction = get_projectile_direction()
+	projectile_body.launch(direction, 15.0)
 
 func get_projectile_direction() -> Vector3:
 	"""Get direction for projectile (toward mouse or forward)"""
@@ -302,11 +303,11 @@ func perform_shield_block(ability: Dictionary):
 
 func create_shield_effect(damage_reduction: float, duration: float):
 	"""Create temporary shield effect"""
-	# This would integrate with the player's damage system
-	# For now, just print the effect
 	print("🛡️ Shield active: ", damage_reduction * 100, "% damage reduction for ", duration, "s")
 	
-	# TODO: Integrate with player's take_damage method
+	# Apply shield directly to player
+	if player.has_method("apply_shield"):
+		player.apply_shield(damage_reduction, duration)
 
 func create_slam_vfx(radius: float):
 	"""Create area slam visual effects"""

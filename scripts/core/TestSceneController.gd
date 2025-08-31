@@ -1,12 +1,17 @@
 extends Node3D
 ## Controller para a cena de teste do Sands of Duat
-## Verifica performance, configurações de rendering e setup inicial
+## Sistema completo com salas procedurais, controles e performance
 
 # Referências aos nós importantes
 @onready var camera: Camera3D = $IsometricCamera
 @onready var debug_label: Label = $UI/DebugLabel
 @onready var player: CharacterBody3D = $Player
 @onready var ground: StaticBody3D = $Ground
+
+# Sistema de salas
+var room_system: Node
+var room_manager: Node
+var game_manager: Node
 
 # Variáveis de teste
 var fps_counter: float = 0.0
@@ -19,10 +24,17 @@ const CAMERA_ANGLE: float = 45.0  # Graus
 const CAMERA_HEIGHT_OFFSET: float = 0.0
 
 func _ready():
-	print("🎬 Sprint 2 Test Scene initialized - Player Controller")
+	print("🎬 Sprint 6 Test Scene initialized - Complete System")
 	
-	# Configura ground collision
-	setup_ground_collision()
+	# Wait for AutoLoad systems
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
+	# Get system references
+	get_system_references()
+	
+	# Remove old ground and setup procedural rooms
+	setup_procedural_rooms()
 	
 	# Inicia monitoring de performance
 	start_performance_monitoring()
@@ -30,21 +42,47 @@ func _ready():
 	# Aplica configurações de rendering
 	apply_rendering_settings()
 	
-	print("✅ Sprint 2 test scene setup complete")
+	print("✅ Sprint 6 complete system ready")
 	print("📊 Target FPS: ", Engine.max_fps)
 	print("👑 Player controller: Khenti ready")
 	print("📷 Smart camera follow system active")
-	print("🎮 Controls: WASD + Space (dash)")
+	print("🏛️ Procedural room system active")
+	print("🎮 Controls: WASD + Space (dash) + Click (attack)")
 
 
-func setup_ground_collision():
-	"""Configura collision do chão"""
-	var collision_shape = ground.get_node("CollisionShape3D")
-	var box_shape = BoxShape3D.new()
-	box_shape.size = Vector3(20, 0.2, 20)
-	collision_shape.shape = box_shape
+func get_system_references():
+	"""Get references to room systems"""
+	room_system = get_node("/root/RoomSystem")
+	room_manager = get_node("/root/RoomManager")
+	game_manager = get_node("/root/GameManager")
 	
-	print("🌍 Ground collision configured")
+	if not room_system:
+		print("❌ RoomSystem not found")
+	if not room_manager:
+		print("❌ RoomManager not found")
+	if not game_manager:
+		print("❌ GameManager not found")
+
+func setup_procedural_rooms():
+	"""Setup procedural room system"""
+	# Remove old ground
+	if ground:
+		ground.queue_free()
+	
+	# Generate first floor
+	if game_manager:
+		var floor_data = game_manager.start_new_floor()
+		if floor_data:
+			print("✅ Test floor generated successfully")
+			
+			# Load starting room
+			if room_manager and room_system:
+				var starting_room = room_system.find_starting_room()
+				if starting_room:
+					room_manager.load_room(starting_room.id)
+					print("🚪 Starting room loaded: ", starting_room.id)
+		else:
+			print("❌ Failed to generate test floor")
 
 func apply_rendering_settings():
 	"""Aplica configurações otimizadas de rendering"""
@@ -112,6 +150,16 @@ func _input(event):
 	
 	if event.is_action_pressed("ui_accept"):  # Enter key
 		test_performance_spike()
+	
+	# Room system controls
+	if event.is_action_pressed("ui_right"):  # Right arrow - transition rooms
+		test_room_transition()
+	
+	if event.is_action_pressed("ui_up"):  # Up arrow - complete room
+		complete_current_room()
+	
+	if event.is_action_pressed("ui_down"):  # Down arrow - generate new floor
+		generate_new_floor()
 
 func print_detailed_debug_info():
 	"""Imprime informações detalhadas de debug"""
@@ -180,3 +228,36 @@ func get_performance_report() -> Dictionary:
 		"camera_distance": CAMERA_DISTANCE,
 		"timestamp": Time.get_unix_time_from_system()
 	}
+
+# Room system control functions
+func test_room_transition():
+	"""Test room transition"""
+	if not room_system or not room_manager:
+		print("❌ Room systems not available")
+		return
+	
+	var available_exits = room_system.get_available_exits()
+	if available_exits.is_empty():
+		print("❌ No available room exits")
+		return
+	
+	var target_room_id = available_exits[0]
+	print("🎯 Transitioning to room: ", target_room_id)
+	room_manager.transition_to_room(target_room_id)
+
+func complete_current_room():
+	"""Complete current room"""
+	if game_manager:
+		game_manager.complete_room()
+		print("✅ Room completion processed")
+	else:
+		print("❌ GameManager not available")
+
+func generate_new_floor():
+	"""Generate new floor"""
+	if game_manager:
+		var floor_data = game_manager.start_new_floor()
+		if floor_data:
+			print("✅ New floor generated with ", floor_data.total_rooms, " rooms")
+		else:
+			print("❌ Floor generation failed")

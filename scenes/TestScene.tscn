@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ok6tkwd3swpm" path="res://scripts/core/TestSceneController.gd" id="1_0j2xk"]
 [ext_resource type="PackedScene" uid="uid://cmcqh1osjxjfn" path="res://scenes/player/Player.tscn" id="2_player"]
-[ext_resource type="Script" uid="uid://cgs730eangs4s" path="res://scripts/camera/IsometricCamera.gd" id="3_camera"]
+[ext_resource type="Script" uid="uid://i7sehuy6fevl" path="res://scripts/camera/IsometricCameraFollow.gd" id="3_camera"]
 [ext_resource type="PackedScene" uid="uid://bfgm6ik2wemgp" path="res://scenes/enemies/BasicEnemy.tscn" id="4_enemy"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1nvkq"]

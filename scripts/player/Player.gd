@@ -27,6 +27,11 @@ var is_stunned: bool = false
 var is_attacking: bool = false
 var movement_modifier: float = 1.0  # For attack slowdown
 
+# Shield system for ability_3 (Divine Ward)
+var shield_active: bool = false
+var shield_damage_reduction: float = 0.0
+var shield_timer: float = 0.0
+
 # Direções baseadas na câmera (calculadas dinamicamente)
 # Será definido em _ready() baseado na orientação real da câmera
 var camera_forward: Vector3
@@ -40,6 +45,7 @@ const JUMP_VELOCITY = 4.5
 
 func _ready():
 	print("👑 Khenti initialized - Prince of the Duat")
+	print("🔍 Player position at start: ", global_position)
 	
 	# Adiciona ao grupo player para detecção de inimigos
 	add_to_group("player")
@@ -76,47 +82,39 @@ func connect_signals():
 
 func setup_player_visual():
 	"""Configura visual básico do Khenti (placeholder)"""
-	# Material dourado egípcio básico
+	# Create player mesh (cylinder for Egyptian theme)
+	var cylinder_mesh = CylinderMesh.new()
+	cylinder_mesh.height = 1.8
+	cylinder_mesh.top_radius = 0.4
+	cylinder_mesh.bottom_radius = 0.4
+	mesh_instance.mesh = cylinder_mesh
+	
+	# Material dourado egípcio básico (mais visível para debug)
 	var material = StandardMaterial3D.new()
 	material.albedo_color = Color.GOLD
 	material.metallic = 0.3
 	material.roughness = 0.7
+	material.emission_enabled = true
+	material.emission = Color(0.5, 0.4, 0.0)  # Emissão dourada para ficar mais visível
 	mesh_instance.material_override = material
+	
+	# Create collision shape
+	var capsule_shape = CapsuleShape3D.new()
+	capsule_shape.height = 1.8
+	capsule_shape.radius = 0.4
+	collision_shape.shape = capsule_shape
 	
 	print("✨ Player visual configured - Golden Egyptian theme")
 
 func setup_camera_directions():
-	"""Calcula direções de movimento baseadas na orientação da câmera"""
-	var camera = get_viewport().get_camera_3d()
-	if not camera:
-		print("⚠️ Camera not found, using default directions")
-		# Fallback para direções padrão
-		camera_forward = Vector3(0, 0, -1)
-		camera_back = Vector3(0, 0, 1)
-		camera_left = Vector3(-1, 0, 0)
-		camera_right = Vector3(1, 0, 0)
-		return
+	"""Configura direções de movimento isométrico simples"""
+	# Direções isométricas fixas (corrigidas para câmera isométrica)
+	camera_forward = Vector3(-1, 0, -1).normalized()   # W = para cima na tela (diagonal trás-esquerda)
+	camera_back = Vector3(1, 0, 1).normalized()       # S = para baixo na tela (diagonal frente-direita)
+	camera_left = Vector3(-1, 0, 1).normalized()      # A = para esquerda na tela
+	camera_right = Vector3(1, 0, -1).normalized()     # D = para direita na tela
 	
-	# Pega as direções da câmera (já na orientação correta)
-	var cam_transform = camera.global_transform
-	
-	# Forward/Back da câmera (direção Z)
-	var cam_forward = -cam_transform.basis.z
-	cam_forward.y = 0  # Mantém no plano horizontal
-	cam_forward = cam_forward.normalized()
-	
-	# Right/Left da câmera (direção X)  
-	var cam_right = cam_transform.basis.x
-	cam_right.y = 0  # Mantém no plano horizontal
-	cam_right = cam_right.normalized()
-	
-	# Mapeia para os controles WASD
-	camera_forward = cam_forward    # W = "para frente" da câmera
-	camera_back = -cam_forward      # S = "para trás" da câmera
-	camera_right = cam_right        # D = "para direita" da câmera  
-	camera_left = -cam_right        # A = "para esquerda" da câmera
-	
-	print("📐 Camera directions calculated:")
+	print("📐 Isometric directions set:")
 	print("  Forward (W): ", camera_forward)
 	print("  Right (D): ", camera_right)
 
@@ -126,8 +124,14 @@ func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
 
+	# Update shield system
+	update_shield_system(delta)
+	
 	# Movement input (apenas se não estiver dashando ou stunned)
-	var is_dashing = dash_system.is_dashing if dash_system else false
+	var is_dashing = false
+	if dash_system and dash_system.has_method("get_dash_info"):
+		var dash_info = dash_system.get_dash_info()
+		is_dashing = dash_info.get("is_dashing", false)
 	if not is_dashing and not is_stunned:
 		handle_movement_input(delta)
 	
@@ -175,6 +179,11 @@ func take_damage(amount: float, _source: Node = null):
 		print("🛡️ Damage blocked by i-frames")
 		return
 	
+	# Apply shield damage reduction
+	if shield_active:
+		amount = amount * (1.0 - shield_damage_reduction)
+		print("🛡️ Shield reduced damage by ", shield_damage_reduction * 100, "% - Final damage: ", amount)
+	
 	current_health = max(current_health - amount, 0)
 	print("💔 Khenti took ", amount, " damage - Health: ", current_health, "/", max_health)
 	
@@ -204,7 +213,10 @@ func update_movement_effects():
 	"""Atualiza efeitos visuais baseados no movimento"""
 	var is_moving = velocity.length() > 0.1 and is_on_floor()
 	
-	var is_dashing = dash_system.is_dashing if dash_system else false
+	var is_dashing = false
+	if dash_system and dash_system.has_method("get_dash_info"):
+		var dash_info = dash_system.get_dash_info()
+		is_dashing = dash_info.get("is_dashing", false)
 	if is_moving and not is_dashing:
 		# TODO: Add walking dust particles in Sprint 8
 		pass
@@ -291,3 +303,29 @@ func flash_material(color: Color, duration: float):
 			await get_tree().create_timer(duration).timeout
 			if material:
 				material.albedo_color = original_color
+
+func update_shield_system(delta):
+	"""Update shield system timer"""
+	if shield_active:
+		shield_timer -= delta
+		if shield_timer <= 0:
+			deactivate_shield()
+
+func apply_shield(damage_reduction: float, duration: float):
+	"""Apply shield effect from ability system"""
+	shield_active = true
+	shield_damage_reduction = damage_reduction
+	shield_timer = duration
+	
+	print("🛡️ Divine Ward activated - ", damage_reduction * 100, "% damage reduction for ", duration, "s")
+	
+	# Visual feedback
+	flash_material(Color.CYAN, 0.2)
+
+func deactivate_shield():
+	"""Deactivate shield effect"""
+	shield_active = false
+	shield_damage_reduction = 0.0
+	shield_timer = 0.0
+	
+	print("🛡️ Divine Ward expired")

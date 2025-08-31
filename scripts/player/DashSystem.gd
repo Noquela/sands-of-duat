@@ -31,8 +31,9 @@ var original_collision_layer: int = 0
 # VFX trail system
 var trail_points: Array[Vector3] = []
 var trail_timer: float = 0.0
-const TRAIL_LENGTH: int = 8
-const TRAIL_INTERVAL: float = 0.05
+const TRAIL_LENGTH: int = 4  # Reduzido para melhor performance
+const TRAIL_INTERVAL: float = 0.1  # Menos frequente
+const ENABLE_PARTICLES: bool = false  # Desabilita partículas para performance
 
 func _ready():
 	print("⚡ Advanced Dash System initialized - Sprint 5")
@@ -75,7 +76,7 @@ func update_timers(delta):
 
 func update_trail(_delta):
 	"""Update VFX trail system"""
-	if is_dashing and trail_timer <= 0:
+	if is_dashing and trail_timer <= 0 and ENABLE_PARTICLES:
 		# Add new trail point
 		trail_points.append(player.global_position)
 		

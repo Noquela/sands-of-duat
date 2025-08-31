@@ -30,6 +30,14 @@ var player_node: Node = null
 var current_room: Node = null
 var hud_manager: Node = null
 
+# Sprint 6: Room system variables
+var current_floor: int = 0
+var game_state: Dictionary = {
+	"rooms_cleared": 0,
+	"rooms_cleared_this_floor": 0,
+	"current_floor": 0
+}
+
 # Configurações de desempenho - Otimizado para 165Hz ultrawide
 var target_fps: int = 165  # Match monitor refresh rate
 var adaptive_fps: bool = true  # Allow dynamic adjustment
@@ -56,6 +64,9 @@ func _ready():
 	
 	# Conecta sinais importantes
 	connect_global_signals()
+	
+	# Room systems now loaded as AutoLoad in project.godot
+	print("🏛️ Room systems available as AutoLoad")
 
 func _process(_delta):
 	# Debug info (apenas se habilitado)
@@ -209,19 +220,110 @@ func load_persistent_data():
 			print("❌ Failed to parse save data")
 	else:
 		print("📁 No save data found - starting fresh")
-		persistent_data = {
-			"currencies": {
-				"memory_fragments": 0,
-				"ankh_fragments": 0,
-				"golden_scarabs": 0,
-				"heart_pieces": 0
-			},
-			"weapons_unlocked": ["was_scepter"],
-			"upgrades_purchased": [],
-			"achievements": [],
-			"runs_completed": 0,
-			"total_deaths": 0
-		}
+
+# Sprint 6: Room System Integration
+func initialize_room_systems_on_ready():
+	"""Initialize room systems after GameManager is ready"""
+	# Call this from existing _ready() function
+	call_deferred("initialize_room_systems")
+
+func initialize_room_systems():
+	"""Initialize room and minimap systems"""
+	# Check if systems already exist
+	if get_node_or_null("/root/RoomSystem"):
+		print("🏛️ RoomSystem already exists")
+		return
+	
+	# Create RoomSystem
+	var room_system_scene = preload("res://scripts/systems/RoomSystem.gd")
+	var room_system = Node.new()
+	room_system.name = "RoomSystem"
+	room_system.set_script(room_system_scene)
+	get_tree().root.add_child(room_system)
+	
+	# Wait a frame for RoomSystem to initialize
+	await get_tree().process_frame
+	
+	# Create RoomManager
+	var room_manager_scene = preload("res://scripts/systems/RoomManager.gd")
+	var room_manager = Node.new()
+	room_manager.name = "RoomManager"
+	room_manager.set_script(room_manager_scene)
+	get_tree().root.add_child(room_manager)
+	
+	print("🏛️ Room systems initialized via GameManager")
+
+func start_new_floor():
+	"""Start a new floor with room generation"""
+	var room_system = get_node("/root/RoomSystem")
+	if room_system:
+		current_floor += 1
+		var floor_data = room_system.generate_floor(current_floor)
+		
+		# Update game state
+		game_state.current_floor = current_floor
+		game_state.rooms_cleared_this_floor = 0
+		
+		print("🏗️ New floor started: ", current_floor)
+		return floor_data
+	
+	print("❌ Failed to start new floor - RoomSystem not found")
+	return null
+
+func complete_room():
+	"""Mark current room as completed"""
+	if not game_state.has("rooms_cleared"):
+		game_state.rooms_cleared = 0
+	if not game_state.has("rooms_cleared_this_floor"):
+		game_state.rooms_cleared_this_floor = 0
+		
+	game_state.rooms_cleared += 1
+	game_state.rooms_cleared_this_floor += 1
+	
+	var room_system = get_node("/root/RoomSystem")
+	if room_system and room_system.current_room_id:
+		room_system._on_room_cleared(room_system.current_room_id)
+		print("✅ Room completed: ", room_system.current_room_id)
+	
+	# Check for floor completion
+	check_floor_completion()
+
+func check_floor_completion():
+	"""Check if current floor is completed"""
+	var room_system = get_node("/root/RoomSystem")
+	if room_system and room_system.is_boss_room_available():
+		print("👑 Boss room unlocked - Floor can be completed!")
+
+func get_current_room_info() -> Dictionary:
+	"""Get current room information"""
+	var room_system = get_node("/root/RoomSystem")
+	var room_manager = get_node("/root/RoomManager")
+	
+	var info = {}
+	
+	if room_system:
+		info.merge(room_system.get_room_info())
+	
+	if room_manager:
+		info.merge(room_manager.get_room_manager_info())
+	
+	return info
+
+func reset_persistent_data():
+	"""Reset persistent data to defaults"""
+	persistent_data = {
+		"currencies": {
+			"memory_fragments": 0,
+			"ankh_fragments": 0,
+			"golden_scarabs": 0,
+			"heart_pieces": 0
+		},
+		"weapons_unlocked": ["was_scepter"],
+		"upgrades_purchased": [],
+		"achievements": [],
+		"runs_completed": 0,
+		"total_deaths": 0
+	}
 
 func connect_global_signals():
 	"""Conecta sinais importantes do jogo"""

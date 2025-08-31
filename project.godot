@@ -16,11 +16,34 @@ run/main_scene="res://scenes/TestScene.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
+[audio]
+
+bus/1/name="Music"
+bus/1/solo=false
+bus/1/mute=false
+bus/1/bypass_fx=false
+bus/1/volume_db=0.0
+bus/1/send="Master"
+bus/2/name="SFX"
+bus/2/solo=false
+bus/2/mute=false
+bus/2/bypass_fx=false
+bus/2/volume_db=0.0
+bus/2/send="Master"
+bus/3/name="Voice"
+bus/3/solo=false
+bus/3/mute=false
+bus/3/bypass_fx=false
+bus/3/volume_db=0.0
+bus/3/send="Master"
+
 [autoload]
 
 GameManager="*res://scripts/core/GameManager.gd"
 AudioManager="*res://scripts/core/AudioManager.gd"
 SceneManager="*res://scripts/core/SceneManager.gd"
+RoomSystem="*res://scripts/systems/RoomSystem.gd"
+RoomManager="*res://scripts/systems/RoomManager.gd"
 
 [debug]
 
@@ -100,8 +123,13 @@ pause={
 3d_physics/layer_4="Projectiles"
 3d_physics/layer_5="Pickups"
 
+[physics]
+
+common/enable_pause_aware_picking=true
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=2
+global_illumination/gi/use_half_resolution=true
 anti_aliasing/quality/msaa_3d=2
 anti_aliasing/quality/screen_space_aa=1
