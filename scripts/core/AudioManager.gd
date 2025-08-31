@@ -240,10 +240,18 @@ func set_voice_volume(volume: float):
 
 func apply_volume_settings():
 	"""Aplica configurações de volume aos buses de áudio"""
+	# Só aplica volumes para buses que existem
 	AudioServer.set_bus_volume_db(AudioBus.MASTER, linear_to_db(master_volume))
-	AudioServer.set_bus_volume_db(AudioBus.MUSIC, linear_to_db(music_volume))
-	AudioServer.set_bus_volume_db(AudioBus.SFX, linear_to_db(sfx_volume))
-	AudioServer.set_bus_volume_db(AudioBus.VOICE, linear_to_db(voice_volume))
+	
+	# Check se os buses existem antes de aplicar configurações
+	if AudioServer.bus_count > AudioBus.MUSIC:
+		AudioServer.set_bus_volume_db(AudioBus.MUSIC, linear_to_db(music_volume))
+	
+	if AudioServer.bus_count > AudioBus.SFX:
+		AudioServer.set_bus_volume_db(AudioBus.SFX, linear_to_db(sfx_volume))
+	
+	if AudioServer.bus_count > AudioBus.VOICE:
+		AudioServer.set_bus_volume_db(AudioBus.VOICE, linear_to_db(voice_volume))
 	
 	audio_settings_changed.emit()
 

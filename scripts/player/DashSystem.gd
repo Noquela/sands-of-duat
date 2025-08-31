@@ -73,7 +73,7 @@ func update_timers(delta):
 	if trail_timer > 0:
 		trail_timer -= delta
 
-func update_trail(delta):
+func update_trail(_delta):
 	"""Update VFX trail system"""
 	if is_dashing and trail_timer <= 0:
 		# Add new trail point
@@ -131,23 +131,22 @@ func get_dash_direction() -> Vector3:
 	"""Get dash direction based on input or facing"""
 	var direction = Vector3.ZERO
 	
-	# Get movement input
-	var input_vector = Vector3(
-		Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
-		0,
-		Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
-	)
+	# Get current movement input (same logic as Player.gd)
+	if player.has_method("get_camera_directions"):
+		var cam_dirs = player.get_camera_directions()
+		
+		# Build direction based on current input
+		if Input.is_action_pressed("move_up"):      # W
+			direction += cam_dirs.forward
+		if Input.is_action_pressed("move_down"):    # S  
+			direction += cam_dirs.back
+		if Input.is_action_pressed("move_left"):    # A
+			direction += cam_dirs.left
+		if Input.is_action_pressed("move_right"):   # D
+			direction += cam_dirs.right
 	
-	if input_vector.length() > 0.1:
-		# Use camera-aligned directions like Player.gd
-		if player.has_method("get_camera_directions"):
-			var cam_dirs = player.get_camera_directions()
-			direction = input_vector.x * cam_dirs.right + input_vector.z * cam_dirs.forward
-		else:
-			# Fallback to basic input
-			direction = input_vector.normalized()
-	else:
-		# Dash forward if no input
+	# If no input, dash in the direction player is facing
+	if direction.length() < 0.1:
 		direction = -player.transform.basis.z
 	
 	direction.y = 0
@@ -159,9 +158,8 @@ func cancel_current_actions():
 	if player.has_method("cancel_attack"):
 		player.cancel_attack()
 	
-	# Reset player state for dash
-	if player.has_property("is_attacking"):
-		player.is_attacking = false
+	# Reset player state for dash - direct access since we know the property exists
+	player.is_attacking = false
 
 func activate_iframes():
 	"""Activate invincibility frames"""
@@ -226,7 +224,7 @@ func create_iframe_vfx():
 	
 	print("🌟 I-frame VFX created")
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	"""Handle dash physics"""
 	if is_dashing:
 		# Maintain dash velocity

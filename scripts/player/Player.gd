@@ -168,7 +168,7 @@ func handle_movement_input(delta):
 		velocity.x = move_toward(velocity.x, 0, movement_speed * 3 * delta)
 		velocity.z = move_toward(velocity.z, 0, movement_speed * 3 * delta)
 
-func take_damage(amount: float, source: Node = null):
+func take_damage(amount: float, _source: Node = null):
 	"""Sistema de dano"""
 	# Check for i-frames from dash system
 	if dash_system and dash_system.has_iframes:
