@@ -5,8 +5,8 @@ extends Node
 signal player_died
 signal run_completed
 signal boon_selected(boon_data)
-signal room_entered(room_type)  # Used by SceneManager and UI systems
-signal boss_defeated(boss_name)  # Used by progression and rewards systems
+signal room_entered(room_type)  # Used by SceneManager and UI systems (Sprint 6)
+signal boss_defeated(boss_name)  # Used by progression and rewards systems (Sprint 10)
 
 # Estados do jogo
 enum GameState {

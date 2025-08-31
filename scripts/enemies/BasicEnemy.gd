@@ -178,7 +178,7 @@ func update_timers(delta):
 		if stun_timer <= 0 and current_state == EnemyState.STUNNED:
 			change_state(EnemyState.IDLE)
 
-func handle_idle_state(delta):
+func handle_idle_state(_delta):
 	"""Estado idle - parado ou começando patrulha"""
 	velocity.x = 0
 	velocity.z = 0
@@ -186,7 +186,7 @@ func handle_idle_state(delta):
 	if patrol_wait_timer <= 0:
 		change_state(EnemyState.PATROLLING)
 
-func handle_patrol_state(delta):
+func handle_patrol_state(_delta):
 	"""Estado de patrulha"""
 	if patrol_points.is_empty():
 		change_state(EnemyState.IDLE)
@@ -210,7 +210,7 @@ func handle_patrol_state(delta):
 	if direction.length() > 0:
 		look_at(global_position + direction, Vector3.UP)
 
-func handle_chase_state(delta):
+func handle_chase_state(_delta):
 	"""Estado de perseguição do player"""
 	if not target_player:
 		change_state(EnemyState.IDLE)
@@ -236,7 +236,7 @@ func handle_chase_state(delta):
 	elif distance <= attack_range:  # In attack range
 		change_state(EnemyState.ATTACKING)
 
-func handle_attack_state(delta):
+func handle_attack_state(_delta):
 	"""Estado de ataque"""
 	velocity.x = 0
 	velocity.z = 0
@@ -260,15 +260,18 @@ func handle_attack_state(delta):
 	if distance > attack_range * 1.2:
 		change_state(EnemyState.CHASING)
 
-func handle_stun_state(delta):
+func handle_stun_state(_delta):
 	"""Estado de stun após tomar dano"""
 	velocity.x = 0
 	velocity.z = 0
 	
 	# Visual feedback for stun
-	mesh_instance.modulate = Color.WHITE.lerp(Color.RED, 0.5)
+	if mesh_instance and mesh_instance.material_override:
+		var material = mesh_instance.material_override as StandardMaterial3D
+		if material:
+			material.albedo_color = Color.WHITE.lerp(Color.RED, 0.5)
 
-func handle_death_state(delta):
+func handle_death_state(_delta):
 	"""Estado de morte"""
 	velocity.x = 0
 	velocity.z = 0
@@ -283,8 +286,11 @@ func change_state(new_state: EnemyState):
 	current_state = new_state
 	
 	# Reset visual effects when leaving stun
-	if current_state != EnemyState.STUNNED:
-		mesh_instance.modulate = Color.WHITE
+	if current_state != EnemyState.STUNNED and mesh_instance:
+		if mesh_instance.material_override:
+			var material = mesh_instance.material_override as StandardMaterial3D
+			if material:
+				material.albedo_color = Color.DARK_RED
 
 func perform_attack():
 	"""Executa ataque no player"""
@@ -302,7 +308,7 @@ func perform_attack():
 		
 		print("💥 Enemy hit player for ", attack_damage, " damage")
 
-func take_damage(amount: float, source: Node = null):
+func take_damage(amount: float, _source: Node = null):
 	"""Recebe dano"""
 	current_health = max(current_health - amount, 0)
 	

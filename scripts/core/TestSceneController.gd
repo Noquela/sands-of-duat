@@ -75,7 +75,7 @@ func _update_performance_display():
 	var target_fps = GameManager.target_fps if GameManager else 165
 	
 	var debug_text = "🏛️ SANDS OF DUAT - Sprint 2 Player Controller\n"
-	debug_text += "FPS: %d / %d (target) - %.1f%% efficiency\n" % [current_fps, target_fps, (float(current_fps) / float(target_fps)) * 100.0]
+	debug_text += "FPS: %d / %d (target) - %.1f%% efficiency\n" % [current_fps, target_fps, (float(current_fps) / max(float(target_fps), 1.0)) * 100.0]
 	debug_text += "Resolution: %dx%d (21:9 Ultrawide)\n" % [get_viewport().size.x, get_viewport().size.y]
 	
 	# Player info

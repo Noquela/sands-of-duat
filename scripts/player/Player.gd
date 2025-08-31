@@ -5,7 +5,7 @@ extends CharacterBody3D
 signal health_changed(new_health, max_health)
 signal player_died
 signal dash_performed
-signal ability_used(ability_name)
+signal ability_used(ability_name)  # Used in Sprint 4 for ability system
 
 # Referências aos nós
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
@@ -31,11 +31,12 @@ var movement_modifier: float = 1.0  # For attack slowdown
 var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 
-# Direções isométricas (45° rotacionadas para vista isométrica)
-const ISO_FORWARD = Vector3(0.707, 0, -0.707)  # Nordeste
-const ISO_BACK = Vector3(-0.707, 0, 0.707)     # Sudoeste  
-const ISO_LEFT = Vector3(-0.707, 0, -0.707)    # Noroeste
-const ISO_RIGHT = Vector3(0.707, 0, 0.707)     # Sudeste
+# Direções baseadas na câmera (calculadas dinamicamente)
+# Será definido em _ready() baseado na orientação real da câmera
+var camera_forward: Vector3
+var camera_back: Vector3  
+var camera_left: Vector3
+var camera_right: Vector3
 
 # Física
 const GRAVITY = 9.8
@@ -43,6 +44,9 @@ const JUMP_VELOCITY = 4.5
 
 func _ready():
 	print("👑 Khenti initialized - Prince of the Duat")
+	
+	# Adiciona ao grupo player para detecção de inimigos
+	add_to_group("player")
 	
 	# Sincroniza stats com GameManager
 	sync_with_game_manager()
@@ -52,6 +56,9 @@ func _ready():
 	
 	# Setup visual inicial
 	setup_player_visual()
+	
+	# Calcula direções baseadas na câmera
+	setup_camera_directions()
 	
 	print("⚡ Movement speed optimized for 165Hz: ", movement_speed)
 
@@ -83,6 +90,41 @@ func setup_player_visual():
 	
 	print("✨ Player visual configured - Golden Egyptian theme")
 
+func setup_camera_directions():
+	"""Calcula direções de movimento baseadas na orientação da câmera"""
+	var camera = get_viewport().get_camera_3d()
+	if not camera:
+		print("⚠️ Camera not found, using default directions")
+		# Fallback para direções padrão
+		camera_forward = Vector3(0, 0, -1)
+		camera_back = Vector3(0, 0, 1)
+		camera_left = Vector3(-1, 0, 0)
+		camera_right = Vector3(1, 0, 0)
+		return
+	
+	# Pega as direções da câmera (já na orientação correta)
+	var cam_transform = camera.global_transform
+	
+	# Forward/Back da câmera (direção Z)
+	var cam_forward = -cam_transform.basis.z
+	cam_forward.y = 0  # Mantém no plano horizontal
+	cam_forward = cam_forward.normalized()
+	
+	# Right/Left da câmera (direção X)  
+	var cam_right = cam_transform.basis.x
+	cam_right.y = 0  # Mantém no plano horizontal
+	cam_right = cam_right.normalized()
+	
+	# Mapeia para os controles WASD
+	camera_forward = cam_forward    # W = "para frente" da câmera
+	camera_back = -cam_forward      # S = "para trás" da câmera
+	camera_right = cam_right        # D = "para direita" da câmera  
+	camera_left = -cam_right        # A = "para esquerda" da câmera
+	
+	print("📐 Camera directions calculated:")
+	print("  Forward (W): ", camera_forward)
+	print("  Right (D): ", camera_right)
+
 func _physics_process(delta):
 	"""Loop principal de física do player - 165Hz ready"""
 	# Gravity
@@ -106,15 +148,15 @@ func handle_movement_input(delta):
 	"""Processa input de movimento isométrico"""
 	var input_vector = Vector3.ZERO
 	
-	# WASD input com transformação isométrica
+	# WASD input com direções calculadas pela câmera
 	if Input.is_action_pressed("move_up"):      # W
-		input_vector += ISO_FORWARD
+		input_vector += camera_forward
 	if Input.is_action_pressed("move_down"):    # S  
-		input_vector += ISO_BACK
+		input_vector += camera_back
 	if Input.is_action_pressed("move_left"):    # A
-		input_vector += ISO_LEFT
+		input_vector += camera_left
 	if Input.is_action_pressed("move_right"):   # D
-		input_vector += ISO_RIGHT
+		input_vector += camera_right
 	
 	# Normalize diagonal movement
 	if input_vector.length() > 0:
@@ -219,12 +261,12 @@ func update_movement_effects():
 		# TODO: Add dash trail effect in Sprint 8
 		pass
 
-func _on_health_changed(new_health: float, max_health: float):
+func _on_health_changed(new_health: float, max_hp: float):
 	"""Callback para mudanças de vida"""
 	# Update GameManager stats
 	if GameManager:
 		GameManager.player_stats.current_health = new_health
-		GameManager.player_stats.max_health = max_health
+		GameManager.player_stats.max_health = max_hp
 
 func set_movement_modifier(modifier: float):
 	"""Define modificador de velocidade (usado pelo sistema de ataque)"""

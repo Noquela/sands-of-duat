@@ -62,11 +62,11 @@ func setup_hit_area():
 	# Collision shape for melee attacks
 	var collision_shape = CollisionShape3D.new()
 	var shape = BoxShape3D.new()
-	shape.size = Vector3(3.0, 2.0, 3.0)  # Área de ataque em frente ao player
+	shape.size = Vector3(4.0, 3.0, 4.0)  # Área de ataque maior para garantir hit
 	collision_shape.shape = shape
 	
 	hit_area.add_child(collision_shape)
-	player.add_child(hit_area)
+	player.add_child.call_deferred(hit_area)
 	
 	# Configure collision layers
 	hit_area.collision_layer = 0  # Don't collide with anything
@@ -85,6 +85,11 @@ func setup_hit_area():
 func connect_signals():
 	"""Conecta sinais importantes"""
 	attack_hit.connect(_on_attack_hit)
+
+func _on_attack_hit(enemy: Node, damage: float):
+	"""Callback quando um ataque acerta um inimigo"""
+	# TODO: Add hit effects like screen shake, particles, etc. in Sprint 8
+	print("🎯 Attack hit callback - Enemy: ", enemy.name, ", Damage: ", damage)
 
 func _process(delta):
 	"""Update attack system"""
@@ -145,9 +150,9 @@ func enable_hit_detection():
 		hit_area.monitoring = true
 		hit_enemies.clear()
 		
-		# Position hit area in front of player
+		# Position hit area in front of player (baseado na direção que está olhando)
 		var forward_dir = -player.transform.basis.z
-		hit_area.position = forward_dir * (attack_range * 0.5)
+		hit_area.position = forward_dir * 1.5  # Colocar mais perto do player
 		
 		# Schedule hit detection disable
 		await get_tree().create_timer(0.2).timeout
@@ -164,7 +169,7 @@ func _on_enemy_entered_attack_area(enemy: Node):
 	if enemy.is_in_group("enemies") and enemy not in hit_enemies:
 		hit_enemy(enemy)
 
-func _on_enemy_exited_attack_area(enemy: Node):
+func _on_enemy_exited_attack_area(_enemy: Node):
 	"""Callback quando inimigo sai da área de ataque"""
 	pass
 
