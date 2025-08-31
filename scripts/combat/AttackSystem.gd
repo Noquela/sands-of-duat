@@ -109,7 +109,12 @@ func _process(delta):
 
 func can_attack() -> bool:
 	"""Verifica se pode atacar"""
-	return not is_attacking and cooldown_timer <= 0 and not player.is_dashing
+	var player_is_dashing = false
+	if player.has_node("DashSystem"):
+		var dash_system = player.get_node("DashSystem")
+		player_is_dashing = dash_system.is_dashing
+	
+	return not is_attacking and cooldown_timer <= 0 and not player_is_dashing
 
 func perform_basic_attack():
 	"""Executa ataque básico com Was Scepter"""

@@ -14,22 +14,18 @@ signal ability_used(ability_name)  # Used in Sprint 4 for ability system
 @onready var visual_effects: Node3D = $VisualEffects
 @onready var audio: AudioStreamPlayer3D = $Audio
 @onready var attack_system: Node = $AttackSystem
+@onready var dash_system: Node = $DashSystem
+@onready var ability_system: Node = $AbilitySystem
 
 # Stats base do jogador (conectados com GameManager)
 var max_health: float = 100.0
 var current_health: float = 100.0
 var movement_speed: float = 8.0  # Aumentado para 165Hz
-var dash_speed: float = 20.0
-var dash_duration: float = 0.3
-var dash_cooldown: float = 1.5
 
 # Estados de movimento e combate
-var is_dashing: bool = false
 var is_stunned: bool = false
 var is_attacking: bool = false
 var movement_modifier: float = 1.0  # For attack slowdown
-var dash_timer: float = 0.0
-var dash_cooldown_timer: float = 0.0
 
 # Direções baseadas na câmera (calculadas dinamicamente)
 # Será definido em _ready() baseado na orientação real da câmera
@@ -69,7 +65,6 @@ func sync_with_game_manager():
 		max_health = stats.get("max_health", 100)
 		current_health = stats.get("current_health", 100)
 		movement_speed = stats.get("movement_speed", 8.0)
-		dash_cooldown = stats.get("dash_cooldown", 1.5)
 		
 		print("📊 Stats synced with GameManager")
 
@@ -131,10 +126,8 @@ func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
 
-	# Dash system
-	update_dash_system(delta)
-	
 	# Movement input (apenas se não estiver dashando ou stunned)
+	var is_dashing = dash_system.is_dashing if dash_system else false
 	if not is_dashing and not is_stunned:
 		handle_movement_input(delta)
 	
@@ -175,54 +168,11 @@ func handle_movement_input(delta):
 		velocity.x = move_toward(velocity.x, 0, movement_speed * 3 * delta)
 		velocity.z = move_toward(velocity.z, 0, movement_speed * 3 * delta)
 
-func update_dash_system(delta):
-	"""Sistema de dash com cooldown"""
-	# Update timers
-	if dash_timer > 0:
-		dash_timer -= delta
-		if dash_timer <= 0:
-			is_dashing = false
-			print("⚡ Dash ended")
-	
-	if dash_cooldown_timer > 0:
-		dash_cooldown_timer -= delta
-	
-	# Check for dash input
-	if Input.is_action_just_pressed("dash") and can_dash():
-		perform_dash()
-
-func can_dash() -> bool:
-	"""Verifica se pode fazer dash"""
-	return dash_cooldown_timer <= 0 and not is_dashing and not is_stunned
-
-func perform_dash():
-	"""Executa dash na direção do movimento"""
-	var dash_direction = Vector3.ZERO
-	
-	# Get current movement direction or forward if stationary
-	if velocity.length() > 0.1:
-		dash_direction = Vector3(velocity.x, 0, velocity.z).normalized()
-	else:
-		dash_direction = -transform.basis.z  # Forward direction
-	
-	# Apply dash velocity
-	velocity.x = dash_direction.x * dash_speed
-	velocity.z = dash_direction.z * dash_speed
-	
-	# Set dash state
-	is_dashing = true
-	dash_timer = dash_duration
-	dash_cooldown_timer = dash_cooldown
-	
-	print("💨 Dash performed - Direction: ", dash_direction)
-	dash_performed.emit()
-	
-	# TODO: Add dash visual effects in Sprint 8
-
 func take_damage(amount: float, source: Node = null):
 	"""Sistema de dano"""
-	if is_dashing:
-		print("🛡️  Damage blocked by dash i-frames")
+	# Check for i-frames from dash system
+	if dash_system and dash_system.has_iframes:
+		print("🛡️ Damage blocked by i-frames")
 		return
 	
 	current_health = max(current_health - amount, 0)
@@ -254,6 +204,7 @@ func update_movement_effects():
 	"""Atualiza efeitos visuais baseados no movimento"""
 	var is_moving = velocity.length() > 0.1 and is_on_floor()
 	
+	var is_dashing = dash_system.is_dashing if dash_system else false
 	if is_moving and not is_dashing:
 		# TODO: Add walking dust particles in Sprint 8
 		pass
@@ -278,37 +229,65 @@ func set_movement_modifier(modifier: float):
 		is_attacking = false
 
 func get_movement_info() -> Dictionary:
-	"""Retorna informações de movimento para debug"""
+	"""Retorna informações de movimento para debug e outros sistemas"""
 	var attack_info = {}
 	if attack_system and attack_system.has_method("get_attack_info"):
 		attack_info = attack_system.get_attack_info()
+	
+	var dash_info = {}
+	if dash_system and dash_system.has_method("get_dash_info"):
+		dash_info = dash_system.get_dash_info()
+	
+	var ability_info = {}
+	if ability_system and ability_system.has_method("get_mana_info"):
+		ability_info = ability_system.get_mana_info()
 	
 	return {
 		"position": global_position,
 		"velocity": velocity,
 		"speed": velocity.length(),
-		"is_dashing": is_dashing,
+		"is_dashing": dash_info.get("is_dashing", false),
 		"is_attacking": is_attacking,
 		"is_on_floor": is_on_floor(),
 		"health": current_health,
-		"dash_cooldown": dash_cooldown_timer,
-		"attack_info": attack_info
+		"attack_info": attack_info,
+		"dash_info": dash_info,
+		"ability_info": ability_info
 	}
 
-# Input handling para abilities (implementadas nos próximos sprints)
+# Input handling para attacks
 func _input(event):
 	"""Handle input events"""
 	if event.is_action_pressed("attack"):
 		# Perform basic attack with Was Scepter
 		if attack_system and attack_system.has_method("perform_basic_attack"):
 			attack_system.perform_basic_attack()
-	
-	if event.is_action_pressed("ability_1"):
-		# TODO: Implement abilities in Sprint 4  
-		print("🔥 Ability 1 - Coming in Sprint 4")
-	
-	if event.is_action_pressed("ability_2"):
-		print("⚡ Ability 2 - Coming in Sprint 4")
-	
-	if event.is_action_pressed("ability_3"):
-		print("💫 Ability 3 - Coming in Sprint 4")
+
+# Sprint 5 Integration Functions
+func get_camera_directions() -> Dictionary:
+	"""Retorna direções da câmera para outros sistemas"""
+	return {
+		"forward": camera_forward,
+		"back": camera_back,
+		"left": camera_left,
+		"right": camera_right
+	}
+
+func cancel_attack():
+	"""Cancela ataque atual (usado pelo dash)"""
+	if attack_system and attack_system.has_method("cancel_current_attack"):
+		attack_system.cancel_current_attack()
+	is_attacking = false
+
+func flash_material(color: Color, duration: float):
+	"""Flash do material do player (para VFX)"""
+	if mesh_instance and mesh_instance.material_override:
+		var material = mesh_instance.material_override as StandardMaterial3D
+		if material:
+			var original_color = material.albedo_color
+			material.albedo_color = color
+			
+			# Restore original color
+			await get_tree().create_timer(duration).timeout
+			if material:
+				material.albedo_color = original_color

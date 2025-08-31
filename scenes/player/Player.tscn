@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cmcqh1osjxjfn"]
+[gd_scene load_steps=7 format=3 uid="uid://cmcqh1osjxjfn"]
 
 [ext_resource type="Script" path="res://scripts/player/Player.gd" id="1_k8vqd"]
 [ext_resource type="Script" path="res://scripts/combat/AttackSystem.gd" id="2_attack"]
+[ext_resource type="Script" path="res://scripts/player/DashSystem.gd" id="3_dash"]
+[ext_resource type="Script" path="res://scripts/player/AbilitySystem.gd" id="4_ability"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_1yxb2"]
 radius = 0.4
@@ -31,3 +33,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="AttackSystem" type="Node" parent="."]
 script = ExtResource("2_attack")
+
+[node name="DashSystem" type="Node" parent="."]
+script = ExtResource("3_dash")
+
+[node name="AbilitySystem" type="Node" parent="."]
+script = ExtResource("4_ability")
