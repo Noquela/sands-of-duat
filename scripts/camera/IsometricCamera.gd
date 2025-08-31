@@ -41,7 +41,16 @@ func setup_isometric_projection():
 	# Set orthogonal projection
 	projection = PROJECTION_ORTHOGONAL
 	
-	# Calculate position based on angle and distance
+	# Check if camera already has a proper isometric transform (from scene)
+	var current_pos = global_position
+	var expected_height = CAMERA_DISTANCE * sin(deg_to_rad(CAMERA_ANGLE)) + CAMERA_HEIGHT_OFFSET
+	
+	# Se a câmera já está numa altura apropriada (configurada na cena), não mover
+	if abs(current_pos.y - expected_height) < 2.0:
+		print("📐 Isometric projection using scene transform - Height: ", current_pos.y)
+		return
+	
+	# Calculate position based on angle and distance (only if not set in scene)
 	var angle_rad = deg_to_rad(CAMERA_ANGLE)
 	var x_pos = CAMERA_DISTANCE * cos(angle_rad) * cos(angle_rad)
 	var y_pos = CAMERA_DISTANCE * sin(angle_rad) + CAMERA_HEIGHT_OFFSET
