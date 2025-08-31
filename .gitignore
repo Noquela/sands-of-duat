@@ -1,0 +1,52 @@
+# Godot 4.x
+.godot/
+export_presets.cfg
+export/
+
+# Imported translations (automatically generated from CSV files)
+*.translation
+
+# Mono-specific ignores
+.mono/
+data_*/
+mono_crash.*.json
+
+# System/OS
+.DS_Store
+*~
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Asset Pipeline
+tools/cache/
+tools/temp/
+*.tmp
+
+# Builds
+builds/
+dist/
+
+# Audio (large files)
+*.wav
+*.ogg
+*.mp3
+
+# 3D Models (large files)  
+*.fbx
+*.glb
+*.gltf
+
+# Textures (large files)
+*.png
+*.jpg
+*.jpeg
+*.tga
+*.exr
+*.hdr
+
+# Exceptions for small UI elements
+!assets/ui/*.png
+!assets/icons/*.png

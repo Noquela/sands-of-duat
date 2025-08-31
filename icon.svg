@@ -1,0 +1,19 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with Egyptian colors -->
+  <circle cx="64" cy="64" r="60" fill="#D4A574" stroke="#8B4513" stroke-width="4"/>
+  
+  <!-- Egyptian ankh symbol -->
+  <g transform="translate(64, 64)">
+    <!-- Ankh cross -->
+    <rect x="-3" y="-10" width="6" height="35" fill="#8B4513"/>
+    <rect x="-15" y="15" width="30" height="6" fill="#8B4513"/>
+    <!-- Ankh loop -->
+    <ellipse cx="0" cy="-20" rx="12" ry="15" fill="none" stroke="#8B4513" stroke-width="6"/>
+  </g>
+  
+  <!-- Border decoration -->
+  <circle cx="64" cy="64" r="58" fill="none" stroke="#CD853F" stroke-width="2"/>
+  
+  <!-- Title text -->
+  <text x="64" y="110" text-anchor="middle" fill="#8B4513" font-family="serif" font-size="10" font-weight="bold">SANDS OF DUAT</text>
+</svg>

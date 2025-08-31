@@ -1,0 +1,72 @@
+[gd_scene load_steps=4 format=3 uid="uid://cjf4v8vuwngsp"]
+
+[ext_resource type="Script" path="res://scripts/core/TestSceneController.gd" id="1_0j2xk"]
+
+[sub_resource type="Environment" id="Environment_1hdyp"]
+background_mode = 1
+background_color = Color(0.2, 0.15, 0.1, 1)
+ambient_light_source = 3
+ambient_light_color = Color(1, 0.9, 0.8, 1)
+ambient_light_energy = 0.3
+sky_rotation = Vector3(0, 1.5708, 0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1nvkq"]
+size = Vector3(20, 0.2, 20)
+
+[node name="TestScene" type="Node3D"]
+script = ExtResource("1_0j2xk")
+
+[node name="Environment" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment"]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 10, 0)
+light_energy = 1.2
+light_indirect_energy = 0.5
+shadow_enabled = true
+directional_shadow_mode = 1
+
+[node name="IsometricCamera" type="Camera3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 12, 0)
+projection = 1
+size = 20
+near = 0.1
+far = 100.0
+
+[node name="CameraController" type="Node3D" parent="IsometricCamera"]
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("BoxMesh_1nvkq")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+
+[node name="PlayerPlaceholder" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerPlaceholder"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerPlaceholder"]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="DebugLabel" type="Label" parent="UI"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -120.0
+offset_right = 400.0
+offset_bottom = -20.0
+text = "🏛️ SANDS OF DUAT - Test Scene
+FPS: 
+Camera: Isometric (45°, distance 12)
+Rendering: Forward+ with MSAA
+Press ESC for debug info"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1hdyp")
