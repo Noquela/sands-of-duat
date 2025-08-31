@@ -5,7 +5,7 @@ extends Node3D
 # Referências aos nós importantes
 @onready var camera: Camera3D = $IsometricCamera
 @onready var debug_label: Label = $UI/DebugLabel
-@onready var player_placeholder: CharacterBody3D = $PlayerPlaceholder
+@onready var player: CharacterBody3D = $Player
 @onready var ground: StaticBody3D = $Ground
 
 # Variáveis de teste
@@ -19,13 +19,7 @@ const CAMERA_ANGLE: float = 45.0  # Graus
 const CAMERA_HEIGHT_OFFSET: float = 0.0
 
 func _ready():
-	print("🎬 Test scene initialized")
-	
-	# Configura câmera isométrica
-	setup_isometric_camera()
-	
-	# Configura player placeholder
-	setup_player_placeholder()
+	print("🎬 Sprint 2 Test Scene initialized - Player Controller")
 	
 	# Configura ground collision
 	setup_ground_collision()
@@ -36,59 +30,12 @@ func _ready():
 	# Aplica configurações de rendering
 	apply_rendering_settings()
 	
-	print("✅ Test scene setup complete")
+	print("✅ Sprint 2 test scene setup complete")
 	print("📊 Target FPS: ", Engine.max_fps)
-	print("🎥 Camera distance: ", CAMERA_DISTANCE)
-	print("📐 Camera angle: ", CAMERA_ANGLE, "°")
-	print("🔥 Godot 4.4 compatibility confirmed")
+	print("👑 Player controller: Khenti ready")
+	print("📷 Smart camera follow system active")
+	print("🎮 Controls: WASD + Space (dash)")
 
-func setup_isometric_camera():
-	"""Configura câmera para vista isométrica perfeita - Otimizada para ultrawide"""
-	# Posição isométrica (45° em X e Y)
-	var angle_rad = deg_to_rad(CAMERA_ANGLE)
-	var x_pos = CAMERA_DISTANCE * cos(angle_rad) * cos(angle_rad)
-	var y_pos = CAMERA_DISTANCE * sin(angle_rad) + CAMERA_HEIGHT_OFFSET
-	var z_pos = CAMERA_DISTANCE * cos(angle_rad) * sin(angle_rad)
-	
-	camera.position = Vector3(x_pos, y_pos, z_pos)
-	
-	# Rotação para olhar para origem com orientação isométrica
-	camera.look_at(Vector3.ZERO, Vector3.UP)
-	
-	# Configura projeção ortogonal para eliminar perspectiva
-	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	
-	# Adjust FOV for ultrawide aspect ratio (21:9)
-	var viewport = get_viewport()
-	var aspect_ratio = float(viewport.size.x) / float(viewport.size.y)
-	var base_size = 20.0
-	
-	# Scale camera size for ultrawide - more horizontal view
-	if aspect_ratio > 1.7:  # Ultrawide detected
-		camera.size = base_size * (aspect_ratio / 1.77)  # Scale based on 16:9 baseline
-		print("📺 Ultrawide aspect ratio detected: ", aspect_ratio, " - Camera size scaled to: ", camera.size)
-	else:
-		camera.size = base_size
-	
-	print("📷 Isometric camera configured for ", viewport.size, " resolution")
-	print("   Position: ", camera.position)
-	print("   Rotation: ", camera.rotation_degrees)
-
-func setup_player_placeholder():
-	"""Configura placeholder do player para testes"""
-	# Cria mesh simples para visualização
-	var mesh_instance = player_placeholder.get_node("MeshInstance3D")
-	var box_mesh = BoxMesh.new()
-	box_mesh.size = Vector3(1.0, 2.0, 1.0)
-	mesh_instance.mesh = box_mesh
-	
-	# Cria collision shape
-	var collision_shape = player_placeholder.get_node("CollisionShape3D")
-	var box_shape = BoxShape3D.new()
-	box_shape.size = Vector3(1.0, 2.0, 1.0)
-	collision_shape.shape = box_shape
-	
-	print("🤖 Player placeholder configured")
 
 func setup_ground_collision():
 	"""Configura collision do chão"""
@@ -123,17 +70,27 @@ func start_performance_monitoring():
 	print("📊 Performance monitoring started")
 
 func _update_performance_display():
-	"""Atualiza display de performance - Ultrawide 165Hz optimized"""
+	"""Atualiza display de performance com info do player"""
 	current_fps = Engine.get_frames_per_second()
 	var target_fps = GameManager.target_fps if GameManager else 165
 	
-	var debug_text = "🏛️ SANDS OF DUAT - Ultrawide 165Hz Edition\n"
+	var debug_text = "🏛️ SANDS OF DUAT - Sprint 2 Player Controller\n"
 	debug_text += "FPS: %d / %d (target) - %.1f%% efficiency\n" % [current_fps, target_fps, (float(current_fps) / float(target_fps)) * 100.0]
 	debug_text += "Resolution: %dx%d (21:9 Ultrawide)\n" % [get_viewport().size.x, get_viewport().size.y]
-	debug_text += "Camera: Isometric (%.1f°, FOV: %.1f)\n" % [CAMERA_ANGLE, camera.size]
-	debug_text += "Rendering: Forward+ MSAA (165Hz optimized)\n"
+	
+	# Player info
+	if player and player.has_method("get_movement_info"):
+		var movement_info = player.get_movement_info()
+		debug_text += "👑 Khenti - Health: %.0f/%.0f | Speed: %.1f\n" % [movement_info.get("health", 0), 100, movement_info.get("speed", 0)]
+		debug_text += "📍 Position: (%.1f, %.1f) | Dash CD: %.1fs\n" % [movement_info.position.x, movement_info.position.z, movement_info.get("dash_cooldown", 0)]
+	
+	# Camera info
+	if camera and camera.has_method("get_camera_info"):
+		var camera_info = camera.get_camera_info()
+		debug_text += "📷 Camera: FOV %.1f | Follow speed: %.1f\n" % [camera_info.get("fov", 0), camera_info.get("follow_speed", 0)]
+	
 	debug_text += "Memory: %.1f MB | Frame: %.2fms\n" % [OS.get_static_memory_usage() / 1024.0 / 1024.0, 1000.0 / max(current_fps, 1)]
-	debug_text += "Press ESC for debug info"
+	debug_text += "🎮 WASD: Move | Space: Dash | ESC: Debug"
 	
 	debug_label.text = debug_text
 	
@@ -211,34 +168,6 @@ func test_performance_spike():
 	
 	print("✅ Performance spike test completed")
 
-func _physics_process(delta):
-	"""Simula movimento básico do player placeholder para testes"""
-	if not player_placeholder:
-		return
-	
-	# Movimento simples com WASD
-	var input_vector = Vector3.ZERO
-	
-	if Input.is_action_pressed("move_left"):
-		input_vector.x -= 1
-	if Input.is_action_pressed("move_right"):
-		input_vector.x += 1
-	if Input.is_action_pressed("move_up"):
-		input_vector.z -= 1
-	if Input.is_action_pressed("move_down"):
-		input_vector.z += 1
-	
-	# Normaliza vetor de movimento
-	if input_vector.length() > 0:
-		input_vector = input_vector.normalized()
-	
-	# Aplica movimento (velocidade de 5 unidades/segundo)
-	var velocity = input_vector * 5.0
-	velocity.y = -9.8  # Gravity
-	
-	# Move character usando Godot 4.x CharacterBody3D
-	player_placeholder.velocity = velocity
-	player_placeholder.move_and_slide()
 
 func get_performance_report() -> Dictionary:
 	"""Retorna relatório de performance para analytics"""
