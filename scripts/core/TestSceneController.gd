@@ -43,7 +43,7 @@ func _ready():
 	print("🔥 Godot 4.4 compatibility confirmed")
 
 func setup_isometric_camera():
-	"""Configura câmera para vista isométrica perfeita"""
+	"""Configura câmera para vista isométrica perfeita - Otimizada para ultrawide"""
 	# Posição isométrica (45° em X e Y)
 	var angle_rad = deg_to_rad(CAMERA_ANGLE)
 	var x_pos = CAMERA_DISTANCE * cos(angle_rad) * cos(angle_rad)
@@ -57,9 +57,20 @@ func setup_isometric_camera():
 	
 	# Configura projeção ortogonal para eliminar perspectiva
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 20.0  # Zoom level
 	
-	print("📷 Isometric camera configured")
+	# Adjust FOV for ultrawide aspect ratio (21:9)
+	var viewport = get_viewport()
+	var aspect_ratio = float(viewport.size.x) / float(viewport.size.y)
+	var base_size = 20.0
+	
+	# Scale camera size for ultrawide - more horizontal view
+	if aspect_ratio > 1.7:  # Ultrawide detected
+		camera.size = base_size * (aspect_ratio / 1.77)  # Scale based on 16:9 baseline
+		print("📺 Ultrawide aspect ratio detected: ", aspect_ratio, " - Camera size scaled to: ", camera.size)
+	else:
+		camera.size = base_size
+	
+	print("📷 Isometric camera configured for ", viewport.size, " resolution")
 	print("   Position: ", camera.position)
 	print("   Rotation: ", camera.rotation_degrees)
 
@@ -112,25 +123,30 @@ func start_performance_monitoring():
 	print("📊 Performance monitoring started")
 
 func _update_performance_display():
-	"""Atualiza display de performance"""
+	"""Atualiza display de performance - Ultrawide 165Hz optimized"""
 	current_fps = Engine.get_frames_per_second()
+	var target_fps = GameManager.target_fps if GameManager else 165
 	
-	var debug_text = "🏛️ SANDS OF DUAT - Test Scene\n"
-	debug_text += "FPS: %d / %d (target)\n" % [current_fps, Engine.max_fps]
-	debug_text += "Camera: Isometric (%.1f°, distance %.1f)\n" % [CAMERA_ANGLE, CAMERA_DISTANCE]
-	debug_text += "Rendering: Forward+ with MSAA\n"
-	debug_text += "Memory: %.1f MB\n" % (OS.get_static_memory_usage(false) / 1024.0 / 1024.0)
+	var debug_text = "🏛️ SANDS OF DUAT - Ultrawide 165Hz Edition\n"
+	debug_text += "FPS: %d / %d (target) - %.1f%% efficiency\n" % [current_fps, target_fps, (float(current_fps) / float(target_fps)) * 100.0]
+	debug_text += "Resolution: %dx%d (21:9 Ultrawide)\n" % [get_viewport().size.x, get_viewport().size.y]
+	debug_text += "Camera: Isometric (%.1f°, FOV: %.1f)\n" % [CAMERA_ANGLE, camera.size]
+	debug_text += "Rendering: Forward+ MSAA (165Hz optimized)\n"
+	debug_text += "Memory: %.1f MB | Frame: %.2fms\n" % [OS.get_static_memory_usage() / 1024.0 / 1024.0, 1000.0 / max(current_fps, 1)]
 	debug_text += "Press ESC for debug info"
 	
 	debug_label.text = debug_text
 	
-	# Alerta se FPS estiver baixo
-	if current_fps < (Engine.max_fps * 0.9):  # 90% do target
-		debug_label.modulate = Color.ORANGE
-	elif current_fps < (Engine.max_fps * 0.7):  # 70% do target
-		debug_label.modulate = Color.RED
-	else:
+	# Performance indicators for high refresh rates
+	var fps_percentage = float(current_fps) / float(target_fps)
+	if fps_percentage >= 0.95:  # 95%+ = Excellent
+		debug_label.modulate = Color.LIME_GREEN
+	elif fps_percentage >= 0.85:  # 85-94% = Good
 		debug_label.modulate = Color.WHITE
+	elif fps_percentage >= 0.70:  # 70-84% = Warning
+		debug_label.modulate = Color.ORANGE
+	else:  # <70% = Critical
+		debug_label.modulate = Color.RED
 
 func _input(event):
 	"""Handles input para debug e testes"""
@@ -146,7 +162,7 @@ func print_detailed_debug_info():
 	print("Performance:")
 	print("  FPS: ", current_fps, " / ", Engine.max_fps, " (target)")
 	print("  Frame time: ", "%.2f" % (1000.0 / max(current_fps, 1)), "ms")
-	print("  Memory usage: ", "%.1f" % (OS.get_static_memory_usage(false) / 1024.0 / 1024.0), "MB")
+	print("  Memory usage: ", "%.1f" % (OS.get_static_memory_usage() / 1024.0 / 1024.0), "MB")
 	
 	print("\nCamera:")
 	print("  Position: ", camera.position)
@@ -229,7 +245,7 @@ func get_performance_report() -> Dictionary:
 	return {
 		"fps": current_fps,
 		"target_fps": Engine.max_fps,
-		"memory_mb": OS.get_static_memory_usage(false) / 1024.0 / 1024.0,
+		"memory_mb": OS.get_static_memory_usage() / 1024.0 / 1024.0,
 		"renderer": "Forward Plus",
 		"msaa_enabled": true,
 		"camera_distance": CAMERA_DISTANCE,

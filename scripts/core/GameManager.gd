@@ -5,8 +5,8 @@ extends Node
 signal player_died
 signal run_completed
 signal boon_selected(boon_data)
-signal room_entered(room_type)
-signal boss_defeated(boss_name)
+signal room_entered(room_type)  # Used by SceneManager and UI systems
+signal boss_defeated(boss_name)  # Used by progression and rewards systems
 
 # Estados do jogo
 enum GameState {
@@ -30,16 +30,23 @@ var player_node: Node = null
 var current_room: Node = null
 var hud_manager: Node = null
 
-# Configurações de desempenho
-var target_fps: int = 60
+# Configurações de desempenho - Otimizado para 165Hz ultrawide
+var target_fps: int = 165  # Match monitor refresh rate
+var adaptive_fps: bool = true  # Allow dynamic adjustment
 var enable_debug: bool = false
 
 func _ready():
 	print("🏛️ Sands of Duat - GameManager initialized")
 	print("⚡ Target FPS: ", target_fps)
 	
-	# Configura performance inicial
-	Engine.max_fps = target_fps
+	# Configura performance inicial - Ultrawide 165Hz
+	Engine.max_fps = target_fps if not adaptive_fps else 0  # 0 = unlimited FPS
+	
+	# Detect monitor refresh rate and adjust if needed
+	var screen_refresh_rate = DisplayServer.screen_get_refresh_rate()
+	if screen_refresh_rate > 0 and adaptive_fps:
+		target_fps = int(screen_refresh_rate)
+		print("📺 Monitor detected: ", screen_refresh_rate, "Hz - Adjusting target to ", target_fps, " FPS")
 	
 	# Inicializa dados de run
 	reset_run_data()
