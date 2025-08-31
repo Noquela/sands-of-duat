@@ -62,6 +62,10 @@ func _ready():
 	
 	# Add to enemies group
 	add_to_group("enemies")
+	
+	# Configure collision layers (Enemy layer = 2)
+	collision_layer = 2  # Enemies are on layer 2
+	collision_mask = 1 | 4  # Collide with Player (1) and Environment (4)
 
 func setup_enemy_visual():
 	"""Configura visual básico do inimigo"""
