@@ -11,7 +11,12 @@
       "mcp__godot__stop_project",
       "Bash(dir scenes)",
       "mcp__sequential-thinking__sequentialthinking",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git config:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

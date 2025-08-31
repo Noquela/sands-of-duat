@@ -560,6 +560,10 @@ func transition_to_room(target_room_id: String):
 	
 	room_transition_started.emit(current_room_id, target_room_id)
 	
+	# Add frame delays to prevent GPU spike
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
 	# Load target room
 	if load_room(target_room_id):
 		# Notify room system

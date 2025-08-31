@@ -128,7 +128,7 @@ func _update_performance_display():
 		debug_text += "📷 Camera: FOV %.1f | Follow speed: %.1f\n" % [camera_info.get("fov", 0), camera_info.get("follow_speed", 0)]
 	
 	debug_text += "Memory: %.1f MB | Frame: %.2fms\n" % [OS.get_static_memory_usage() / 1024.0 / 1024.0, 1000.0 / max(current_fps, 1)]
-	debug_text += "🎮 WASD: Move | Space: Dash | ESC: Debug"
+	debug_text += "🎮 WASD: Move | Space: Dash | F1: Room+ | F2: Complete | F3: Floor+"
 	
 	debug_label.text = debug_text
 	
@@ -151,14 +151,14 @@ func _input(event):
 	if event.is_action_pressed("ui_accept"):  # Enter key
 		test_performance_spike()
 	
-	# Room system controls
-	if event.is_action_pressed("ui_right"):  # Right arrow - transition rooms
+	# Room system controls (using dedicated F keys)
+	if event.is_action_pressed("room_transition"):  # F1 - transition rooms
 		test_room_transition()
 	
-	if event.is_action_pressed("ui_up"):  # Up arrow - complete room
+	if event.is_action_pressed("room_complete"):  # F2 - complete room
 		complete_current_room()
 	
-	if event.is_action_pressed("ui_down"):  # Down arrow - generate new floor
+	if event.is_action_pressed("room_new_floor"):  # F3 - generate new floor
 		generate_new_floor()
 
 func print_detailed_debug_info():
