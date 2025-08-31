@@ -13,7 +13,7 @@ config_version=5
 config/name="Sands of Duat"
 config/description="ARPG roguelike isométrico 3D inspirado em Hades, com mitologia egípcia. Khenti, um príncipe assassinado, luta para escapar do Duat e retornar ao mundo dos vivos."
 run/main_scene="res://scenes/TestScene.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]

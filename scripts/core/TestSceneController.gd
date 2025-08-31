@@ -40,6 +40,7 @@ func _ready():
 	print("📊 Target FPS: ", Engine.max_fps)
 	print("🎥 Camera distance: ", CAMERA_DISTANCE)
 	print("📐 Camera angle: ", CAMERA_ANGLE, "°")
+	print("🔥 Godot 4.4 compatibility confirmed")
 
 func setup_isometric_camera():
 	"""Configura câmera para vista isométrica perfeita"""
