@@ -16,7 +16,11 @@
       "Bash(git remote get-url:*)",
       "Bash(gh repo create:*)",
       "Bash(git remote add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(rm:*)",
+      "mcp__godot__create_scene",
+      "mcp__godot__add_node",
+      "mcp__godot__save_scene"
     ],
     "deny": [],
     "ask": []

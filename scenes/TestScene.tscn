@@ -1,82 +1,45 @@
-[gd_scene load_steps=7 format=3 uid="uid://cjf4v8vuwngsp"]
+[gd_scene load_steps=6 format=3 uid="uid://dndsi7bjifdgq"]
 
-[ext_resource type="Script" uid="uid://ok6tkwd3swpm" path="res://scripts/core/TestSceneController.gd" id="1_0j2xk"]
-[ext_resource type="PackedScene" uid="uid://cmcqh1osjxjfn" path="res://scenes/player/Player.tscn" id="2_player"]
-[ext_resource type="Script" uid="uid://i7sehuy6fevl" path="res://scripts/camera/IsometricCameraFollow.gd" id="3_camera"]
-[ext_resource type="PackedScene" uid="uid://bfgm6ik2wemgp" path="res://scenes/enemies/BasicEnemy.tscn" id="4_enemy"]
+[ext_resource type="PackedScene" uid="uid://bd2j6y26cjocm" path="res://scenes/player/Player.tscn" id="1_5tc3j"]
+[ext_resource type="Script" uid="uid://c24ng0omogcg0" path="res://scripts/camera/IsometricCameraFollow.gd" id="2_8sv7l"]
+[ext_resource type="PackedScene" uid="uid://b4x1h6p5klwej" path="res://scenes/enemies/TestEnemy.tscn" id="3_enemy"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_1nvkq"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_7nmaj"]
+size = Vector2(20, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1hg8s"]
 size = Vector3(20, 0.2, 20)
 
-[sub_resource type="Environment" id="Environment_1hdyp"]
-background_mode = 1
-background_color = Color(0.2, 0.15, 0.1, 1)
-sky_rotation = Vector3(0, 1.5708, 0)
-ambient_light_source = 3
-ambient_light_color = Color(1, 0.9, 0.8, 1)
-ambient_light_energy = 0.3
+[node name="root" type="Node3D"]
 
-[node name="TestScene" type="Node3D"]
-script = ExtResource("1_0j2xk")
+[node name="Player" parent="." instance=ExtResource("1_5tc3j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 
-[node name="Environment" type="Node3D" parent="."]
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment"]
-transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 10, 0)
-light_energy = 1.2
-light_indirect_energy = 0.5
-shadow_enabled = true
-directional_shadow_mode = 1
-
-[node name="IsometricCamera" type="Camera3D" parent="." groups=["camera"]]
-transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 12, 0)
+[node name="IsometricCamera" type="Camera3D" parent="."]
+transform = Transform3D(0.707107, -0.408248, 0.57735, 0, 0.816497, 0.57735, -0.707107, -0.408248, 0.57735, 12, 12, 12)
 projection = 1
-size = 20.0
-near = 0.1
-far = 100.0
-script = ExtResource("3_camera")
+fov = 45.0
+script = ExtResource("2_8sv7l")
+target = NodePath("../Player")
 
-[node name="Ground" type="StaticBody3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 8, 0)
+shadow_enabled = true
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
-mesh = SubResource("BoxMesh_1nvkq")
+[node name="FloorBody" type="StaticBody3D" parent="."]
+collision_layer = 4
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+[node name="FloorMesh" type="MeshInstance3D" parent="FloorBody"]
+mesh = SubResource("PlaneMesh_7nmaj")
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="FloorCollision" type="CollisionShape3D" parent="FloorBody"]
+shape = SubResource("BoxShape3D_1hg8s")
 
-[node name="Enemies" type="Node3D" parent="."]
+[node name="TestEnemy" parent="." instance=ExtResource("3_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.1, 0)
 
-[node name="Enemy1" parent="Enemies" instance=ExtResource("4_enemy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 0)
+[node name="TestEnemy2" parent="." instance=ExtResource("3_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.1, 4)
 
-[node name="Enemy2" parent="Enemies" instance=ExtResource("4_enemy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, 4)
-
-[node name="Enemy3" parent="Enemies" instance=ExtResource("4_enemy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, -6)
-
-[node name="UI" type="CanvasLayer" parent="."]
-
-[node name="DebugLabel" type="Label" parent="UI"]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = -140.0
-offset_right = 500.0
-offset_bottom = -20.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-text = "🏛️ SANDS OF DUAT - Sprint 3 Combat System
-FPS: 
-Movement: WASD + Space (dash)
-Combat: Left Click (Was Scepter attack)
-Camera: Smart follow with look-ahead
-Press ESC for debug info"
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_1hdyp")
+[node name="TestEnemy3" parent="." instance=ExtResource("3_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.1, -5)

@@ -1,30 +1,32 @@
 extends Camera3D
-## Câmera isométrica que segue o player - Sprint 6 Test
 
-@export var target: Node3D  # Player target
-@export var offset: Vector3 = Vector3(5, 12, 5)  # Offset da câmera
+@export var target: Node3D
 @export var follow_speed: float = 5.0
-@export var look_ahead_distance: float = 2.0
+@export var distance: float = 12.0
+@export var height: float = 12.0
+
+var offset: Vector3
 
 func _ready():
-	print("📷 Isometric Camera Follow initialized")
-	
-	# Find player if not assigned
 	if not target:
 		var player = get_tree().get_first_node_in_group("player")
 		if player:
 			target = player
-			print("🎯 Camera target found: ", player.name)
+	
+	setup_isometric_position()
 
-func _process(delta):
-	if not target:
-		return
+func setup_isometric_position():
+	position = Vector3(distance, height, distance)
+	look_at(Vector3.ZERO, Vector3.UP)
+	projection = PROJECTION_ORTHOGONAL if false else PROJECTION_PERSPECTIVE
+	fov = 45.0
+
+func _physics_process(delta):
+	if target:
+		follow_target(delta)
+
+func follow_target(delta):
+	var target_position = target.global_position + offset
+	var desired_position = target_position + Vector3(distance, height, distance)
 	
-	# Calculate target position
-	var target_pos = target.global_position + offset
-	
-	# Smooth follow
-	global_position = global_position.lerp(target_pos, follow_speed * delta)
-	
-	# Always look at player position
-	look_at(target.global_position, Vector3.UP)
+	global_position = global_position.lerp(desired_position, follow_speed * delta)
