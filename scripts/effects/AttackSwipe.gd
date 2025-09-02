@@ -39,10 +39,10 @@ func set_material_alpha(alpha: float):
 	if material:
 		material.albedo_color.a = alpha
 
-func setup_swipe(attack_direction: Vector3, attack_range: float):
+func setup_swipe(attack_direction: Vector3, swipe_range: float):
 	# Orient the swipe to face attack direction
 	if attack_direction != Vector3.ZERO:
 		look_at(global_position + attack_direction, Vector3.UP)
 	
 	# Scale based on weapon range
-	scale = Vector3(attack_range * 0.5, 1.0, attack_range * 0.5)
+	scale = Vector3(swipe_range * 0.5, 1.0, swipe_range * 0.5)

@@ -159,13 +159,13 @@ func fire_projectile(origin: Vector3, direction: Vector3, projectile_damage: flo
 	
 	print("Fired arrow for ", projectile_damage, " damage")
 
-func spawn_attack_swipe(origin: Vector3, direction: Vector3, attack_range: float):
+func spawn_attack_swipe(origin: Vector3, direction: Vector3, swipe_range: float):
 	var AttackSwipeScene = preload("res://scenes/effects/AttackSwipe.tscn")
 	var swipe = AttackSwipeScene.instantiate()
 	
 	get_tree().current_scene.add_child(swipe)
-	swipe.global_position = origin + direction * (attack_range * 0.5)
-	swipe.setup_swipe(direction, attack_range)
+	swipe.global_position = origin + direction * (swipe_range * 0.5)
+	swipe.setup_swipe(direction, swipe_range)
 
 func apply_hitstop():
 	# Freeze game briefly for impact feeling
