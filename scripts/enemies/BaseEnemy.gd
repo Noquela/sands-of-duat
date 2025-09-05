@@ -29,7 +29,6 @@ signal enemy_dealt_damage(target: Node3D, damage: float)
 # Core systems
 const HealthSystemClass = preload("res://scripts/combat/HealthSystem.gd")
 var health_system: HealthSystemClass
-var navigation_agent: NavigationAgent3D
 
 # State management
 var current_state: State = State.IDLE
@@ -47,7 +46,6 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func _ready():
 	setup_enemy()
-	setup_navigation()
 	setup_health()
 	
 	# Add to enemies group
@@ -61,15 +59,6 @@ func setup_enemy():
 	collision_layer = 2  # Enemies layer
 	collision_mask = 5   # Player + Environment (1 + 4)
 
-func setup_navigation():
-	# Create NavigationAgent3D
-	navigation_agent = NavigationAgent3D.new()
-	add_child(navigation_agent)
-	
-	# Configure navigation
-	navigation_agent.target_desired_distance = attack_range
-	navigation_agent.path_desired_distance = 0.5
-	navigation_agent.navigation_finished.connect(_on_navigation_finished)
 
 func setup_health():
 	# Create health system
@@ -112,12 +101,6 @@ func handle_idle_state(delta):
 		print(name, " spotted player! Entering chase state")
 		change_state(State.CHASE)
 		return
-	
-	# Debug: Check if we can find player at all
-	if player_target and is_instance_valid(player_target):
-		var dist = global_position.distance_to(player_target.global_position)
-		if dist <= detection_radius * 2:  # Double detection radius for debug
-			print(name, " player in extended range but not chasing. Distance: ", dist)
 	
 	# Idle movement (optional - can add patrol later)
 	velocity.x = move_toward(velocity.x, 0, move_speed * delta)
@@ -172,28 +155,43 @@ func move_towards_target(delta):
 	if not player_target or not is_instance_valid(player_target):
 		return
 	
-	# Use direct movement toward player instead of navigation mesh
-	var current_position = global_position
-	var target_position = player_target.global_position
-	var direction = (target_position - current_position).normalized()
+	# Use direct movement toward player - force recalculation every frame
+	var enemy_pos = global_position
+	var player_pos = player_target.global_position
 	
-	# Apply movement
+	# Calculate raw direction vector
+	var raw_direction = player_pos - enemy_pos
+	
+	# Ensure we're only moving on X and Z axes (no Y movement for ground units)
+	raw_direction.y = 0.0
+	var direction = raw_direction.normalized()
+	
+	# Apply movement only on horizontal plane
 	velocity.x = direction.x * move_speed
 	velocity.z = direction.z * move_speed
 	
 	# Face movement direction
-	if direction != Vector3.ZERO:
+	if direction.length() > 0.1:
 		var target_rotation = atan2(-direction.x, -direction.z)
 		rotation.y = lerp_angle(rotation.y, target_rotation, 5.0 * delta)
-		
-	print(name, " moving toward player. Direction: ", direction)
+	
+	# Minimal debug
+	if randf() < 0.01:  # Only 1% chance to print debug
+		print(name, " moving: E(", enemy_pos.x, ",", enemy_pos.z, ") to P(", player_pos.x, ",", player_pos.z, ") = Dir(", direction.x, ",", direction.z, ")")
 
 func can_see_player() -> bool:
 	if not player_target or not is_instance_valid(player_target):
+		print(name, " - No valid player target found!")
 		return false
 	
 	var distance = global_position.distance_to(player_target.global_position)
-	return distance <= detection_radius
+	var can_see = distance <= detection_radius
+	
+	# Debug only for enemies that should be detecting but aren't
+	if distance <= detection_radius * 1.2 and not can_see:
+		print(name, " - Player at distance ", distance, " vs detection radius ", detection_radius)
+	
+	return can_see
 
 func perform_attack():
 	if not player_target or not is_instance_valid(player_target):
@@ -241,6 +239,3 @@ func _on_death():
 func _on_attack_cooldown_finished():
 	can_attack = true
 
-func _on_navigation_finished():
-	# Navigation completed - can be used for specific behaviors
-	pass

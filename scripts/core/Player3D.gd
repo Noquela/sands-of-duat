@@ -16,6 +16,7 @@ var weapon_system: WeaponSystemClass
 var health_system: HealthSystemClass
 
 func _ready():
+	add_to_group("player")
 	setup_combat_systems()
 
 func setup_combat_systems():

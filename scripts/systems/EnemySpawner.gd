@@ -8,8 +8,8 @@ signal all_waves_completed
 @export_group("Spawning")
 @export var max_enemies_alive: int = 8
 @export var wave_delay: float = 3.0
-@export var spawn_radius: float = 15.0
-@export var min_spawn_distance: float = 8.0
+@export var spawn_radius: float = 20.0
+@export var min_spawn_distance: float = 12.0
 
 @export_group("Enemy Scenes")
 var shade_scene = preload("res://scenes/enemies/ShadeOfTheLost.tscn")
@@ -156,9 +156,14 @@ func get_random_spawn_position() -> Vector3:
 			spawn_pos.y = result.position.y + 0.1
 			return spawn_pos
 	
-	# Fallback position if no valid spot found
+	# Fallback position if no valid spot found - much farther away
 	print("Warning: Using fallback spawn position")
-	return player_pos + Vector3(10, 0.5, 0)
+	var fallback_angle = randf() * TAU
+	return player_pos + Vector3(
+		cos(fallback_angle) * 15.0,
+		0.5,
+		sin(fallback_angle) * 15.0
+	)
 
 func wait_for_space():
 	while enemies_alive.size() >= max_enemies_alive:
