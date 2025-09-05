@@ -7,6 +7,8 @@ const JUMP_VELOCITY = 4.5
 const CombatSystemClass = preload("res://scripts/combat/CombatSystem.gd")
 const WeaponSystemClass = preload("res://scripts/combat/WeaponSystem.gd") 
 const HealthSystemClass = preload("res://scripts/combat/HealthSystem.gd")
+const DashSystemClass = preload("res://scripts/systems/DashSystem.gd")
+const AbilitySystemClass = preload("res://scripts/systems/AbilitySystem.gd")
 
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
@@ -14,6 +16,8 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var combat_system: CombatSystemClass
 var weapon_system: WeaponSystemClass
 var health_system: HealthSystemClass
+var dash_system: DashSystemClass
+var ability_system: AbilitySystemClass
 
 func _ready():
 	add_to_group("player")
@@ -35,6 +39,21 @@ func setup_combat_systems():
 	health_system.can_regenerate = true
 	health_system.regeneration_rate = 5.0
 	add_child(health_system)
+	
+	# Create dash system
+	dash_system = DashSystemClass.new()
+	add_child(dash_system)
+	
+	# Connect dash signals
+	dash_system.dash_started.connect(_on_dash_started)
+	dash_system.dash_ended.connect(_on_dash_ended)
+	
+	# Create ability system
+	ability_system = AbilitySystemClass.new()
+	add_child(ability_system)
+	
+	# Connect ability signals
+	ability_system.ability_used.connect(_on_ability_used)
 
 func _physics_process(delta):
 	handle_gravity(delta)
@@ -51,6 +70,10 @@ func handle_gravity(delta):
 		velocity.y -= gravity * delta
 
 func handle_movement(delta):
+	# Don't handle normal movement during dash
+	if dash_system and dash_system.is_dashing:
+		return
+		
 	var input_dir = Vector2.ZERO
 	
 	if Input.is_action_pressed("ui_right") or Input.is_action_pressed("move_right"):
@@ -88,3 +111,35 @@ func handle_movement(delta):
 		weapon_system.switch_weapon("khopesh")
 	elif Input.is_action_just_pressed("switch_weapon_3"):
 		weapon_system.switch_weapon("egyptian_bow")
+
+# Dash system callbacks
+func _on_dash_started():
+	print("Player dash started!")
+	# Cancel any ongoing attacks
+	if combat_system:
+		combat_system.is_attacking = false
+
+func _on_dash_ended():
+	print("Player dash ended!")
+
+# Ability system callbacks
+func _on_ability_used(ability_name: String):
+	print("Player used ability: ", ability_name)
+
+# Public API for damage system
+func take_damage(damage: float):
+	# Check for i-frames
+	if dash_system and dash_system.is_player_invulnerable():
+		print("Damage blocked by i-frames!")
+		return
+	
+	# Check for shield
+	if has_meta("has_shield"):
+		var shield_reduction = get_meta("shield_reduction", 0.0)
+		damage = damage * (1.0 - shield_reduction)
+		print("Damage reduced by shield: ", damage)
+	
+	# Apply damage to health system
+	if health_system:
+		health_system.take_damage(damage)
+		print("Player took ", damage, " damage")
