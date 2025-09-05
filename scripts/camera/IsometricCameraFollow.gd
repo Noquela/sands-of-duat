@@ -2,6 +2,7 @@ extends Camera3D
 
 @export var target: Node3D
 @export var follow_speed: float = 5.0
+@export var dash_follow_speed: float = 15.0
 @export var distance: float = 12.0
 @export var height: float = 12.0
 
@@ -29,4 +30,11 @@ func follow_target(delta):
 	var target_position = target.global_position + offset
 	var desired_position = target_position + Vector3(distance, height, distance)
 	
-	global_position = global_position.lerp(desired_position, follow_speed * delta)
+	# Check if target is dashing and adjust follow speed
+	var current_follow_speed = follow_speed
+	if target.has_method("get_node") and target.get_node_or_null("DashSystem"):
+		var dash_system = target.get_node("DashSystem")
+		if dash_system and dash_system.is_dashing:
+			current_follow_speed = dash_follow_speed
+	
+	global_position = global_position.lerp(desired_position, current_follow_speed * delta)

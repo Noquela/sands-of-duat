@@ -131,16 +131,20 @@ func get_dash_direction() -> Vector3:
 	return direction.normalized()
 
 func start_dash_movement(target_position: Vector3):
-	# Create smooth dash movement using Tween
-	if tween:
-		tween.kill()
+	# Use physics-based movement for smoother camera following
+	if not player:
+		return
 	
-	tween = create_tween()
-	tween.set_ease(Tween.EASE_OUT)
-	tween.set_trans(Tween.TRANS_CUBIC)
+	# Calculate dash velocity for smooth movement
+	var dash_direction = (target_position - player.global_position).normalized()
+	var dash_speed = dash_distance / dash_duration
 	
-	# Move player to target position
-	tween.tween_method(set_dash_position, player.global_position, target_position, dash_duration)
+	# Set dash velocity (will be applied in _physics_process)
+	player.velocity.x = dash_direction.x * dash_speed
+	player.velocity.z = dash_direction.z * dash_speed
+	
+	# Store original movement state to restore later
+	set_meta("dash_original_velocity", Vector3(player.velocity.x, 0, player.velocity.z))
 
 func set_dash_position(pos: Vector3):
 	if player and is_dashing:
@@ -194,6 +198,11 @@ func end_dash():
 	# Stop movement tween if still active
 	if tween:
 		tween.kill()
+	
+	# Reset player velocity to normal movement
+	if player:
+		player.velocity.x = 0
+		player.velocity.z = 0
 	
 	# End VFX
 	cleanup_dash_effects()
