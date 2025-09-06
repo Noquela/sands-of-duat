@@ -13,6 +13,8 @@
 [ext_resource type="Script" uid="uid://bx54vi3iwi3sa" path="res://scripts/systems/StatusEffectSystem.gd" id="11_status"]
 [ext_resource type="Script" uid="uid://cu2rjxrab5yw5" path="res://scripts/systems/WallSlamSystem.gd" id="12_wall_slam"]
 [ext_resource type="Script" uid="uid://drrdj2pwigvsh" path="res://scripts/systems/BossEncounter.gd" id="13_boss_encounter"]
+[ext_resource type="Script" path="res://scripts/systems/MemorySystem.gd" id="14_memory"]
+[ext_resource type="Script" path="res://scripts/systems/WeaponAspectSystem.gd" id="15_weapon_aspect"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7nmaj"]
 size = Vector2(20, 20)
@@ -80,6 +82,12 @@ script = ExtResource("12_wall_slam")
 
 [node name="BossEncounter" type="Node" parent="."]
 script = ExtResource("13_boss_encounter")
+
+[node name="MemorySystem" type="Node" parent="."]
+script = ExtResource("14_memory")
+
+[node name="WeaponAspectSystem" type="Node" parent="."]
+script = ExtResource("15_weapon_aspect")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
