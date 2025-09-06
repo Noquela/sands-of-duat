@@ -232,9 +232,9 @@ func cast_shadow_barrier():
 	var barrier_timer = get_tree().create_timer(8.0)
 	barrier_timer.timeout.connect(remove_shadow_barriers)
 
-func create_shadow_barrier(position: Vector3):
+func create_shadow_barrier(barrier_position: Vector3):
 	# Create barrier visual effect (placeholder - would be actual 3D mesh)
-	print("Shadow barrier created at: ", position)
+	print("Shadow barrier created at: ", barrier_position)
 	# This would create an actual 3D object with collision
 
 func remove_shadow_barriers():
@@ -253,9 +253,9 @@ func summon_shade_minions():
 		
 		summon_shade_at_position(spawn_pos)
 
-func summon_shade_at_position(position: Vector3):
+func summon_shade_at_position(spawn_position: Vector3):
 	# This would instantiate actual Shade enemy
-	print("Shade summoned at: ", position)
+	print("Shade summoned at: ", spawn_position)
 	# For now, just print - actual implementation would create Shade enemy
 
 func launch_dark_projectiles():
@@ -277,8 +277,8 @@ func launch_dark_projectiles():
 		launch_dark_projectile(rotated_direction)
 
 func launch_dark_projectile(direction: Vector3):
-	var projectile_speed = 12.0
-	var projectile_damage = 35.0
+	var _projectile_speed = 12.0
+	var _projectile_damage = 35.0
 	
 	print("Dark projectile launched in direction: ", direction)
 	# This would create actual projectile with physics

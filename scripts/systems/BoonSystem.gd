@@ -322,6 +322,128 @@ func add_ra_boons():
 		},
 		"icon": "res://icons/boons/ra_burning_trail.png"
 	})
+	
+	# NEW RA BOONS - EXPANSION
+	boon_database.append({
+		"id": "ra_solar_flare",
+		"name": "Solar Flare",
+		"description": "Critical hits create explosive solar bursts.",
+		"god": BoonGod.RA,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.EPIC,
+		"max_stacks": 2,
+		"effects": {
+			"burst_damage": [40, 65],
+			"burst_radius": [3, 4]
+		},
+		"icon": "res://icons/boons/ra_solar_flare.png"
+	})
+	
+	boon_database.append({
+		"id": "ra_sunlight_healing",
+		"name": "Sunlight Healing",
+		"description": "Standing in sunlight slowly restores health.",
+		"god": BoonGod.RA,
+		"type": BoonType.DEFENSE,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 3,
+		"effects": {
+			"healing_per_second": [2, 4, 6],
+			"sunlight_detection": [true]
+		},
+		"icon": "res://icons/boons/ra_sunlight_healing.png"
+	})
+	
+	boon_database.append({
+		"id": "ra_dawn_blessing",
+		"name": "Dawn's Blessing",
+		"description": "First attack each room deals massive fire damage.",
+		"god": BoonGod.RA,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.RARE,
+		"max_stacks": 2,
+		"effects": {
+			"first_attack_multiplier": [2.0, 2.5],
+			"fire_damage_bonus": [50, 75]
+		},
+		"icon": "res://icons/boons/ra_dawn_blessing.png"
+	})
+	
+	boon_database.append({
+		"id": "ra_solar_charge",
+		"name": "Solar Charge",
+		"description": "Abilities charge 25% faster in combat.",
+		"god": BoonGod.RA,
+		"type": BoonType.UTILITY,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 4,
+		"effects": {
+			"ability_charge_speed": [1.25, 1.5, 1.75, 2.0],
+			"combat_only": [true]
+		},
+		"icon": "res://icons/boons/ra_solar_charge.png"
+	})
+	
+	boon_database.append({
+		"id": "ra_pharaohs_crown",
+		"name": "Pharaoh's Crown",
+		"description": "Gain immunity to status effects while at full health.",
+		"god": BoonGod.RA,
+		"type": BoonType.DEFENSE,
+		"rarity": BoonRarity.EPIC,
+		"max_stacks": 1,
+		"effects": {
+			"status_immunity": [true],
+			"full_health_required": [true]
+		},
+		"icon": "res://icons/boons/ra_pharaohs_crown.png"
+	})
+	
+	boon_database.append({
+		"id": "ra_divine_wrath",
+		"name": "Divine Wrath",
+		"description": "Taking damage increases fire damage for a short time.",
+		"god": BoonGod.RA,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.RARE,
+		"max_stacks": 3,
+		"effects": {
+			"damage_bonus": [30, 50, 70],
+			"duration": [5, 6, 7],
+			"trigger_on_damage": [true]
+		},
+		"icon": "res://icons/boons/ra_divine_wrath.png"
+	})
+	
+	boon_database.append({
+		"id": "ra_solar_weapon",
+		"name": "Solar Weapon",
+		"description": "Weapon attacks have chance to blind enemies.",
+		"god": BoonGod.RA,
+		"type": BoonType.UTILITY,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 3,
+		"effects": {
+			"blind_chance": [20, 30, 40],
+			"blind_duration": [2, 3, 4]
+		},
+		"icon": "res://icons/boons/ra_solar_weapon.png"
+	})
+	
+	boon_database.append({
+		"id": "ra_eternal_flame",
+		"name": "Eternal Flame",
+		"description": "Fire effects never expire and stack infinitely.",
+		"god": BoonGod.RA,
+		"type": BoonType.SPECIAL,
+		"rarity": BoonRarity.LEGENDARY,
+		"max_stacks": 1,
+		"effects": {
+			"infinite_fire_stacks": [true],
+			"permanent_burn": [true]
+		},
+		"icon": "res://icons/boons/ra_eternal_flame.png"
+	})
 
 func add_thoth_boons():
 	# Thoth - Magic and Knowledge boons
@@ -398,6 +520,130 @@ func add_thoth_boons():
 			"cast_speed_bonus": [20, 35, 50]
 		},
 		"icon": "res://icons/boons/thoth_scroll_mastery.png"
+	})
+	
+	# NEW THOTH BOONS - EXPANSION
+	boon_database.append({
+		"id": "thoth_mystical_shield",
+		"name": "Mystical Shield",
+		"description": "Absorbs damage and converts it into mana.",
+		"god": BoonGod.THOTH,
+		"type": BoonType.DEFENSE,
+		"rarity": BoonRarity.RARE,
+		"max_stacks": 3,
+		"effects": {
+			"shield_capacity": [100, 150, 200],
+			"damage_to_mana_ratio": [0.5, 0.7, 1.0]
+		},
+		"icon": "res://icons/boons/thoth_mystical_shield.png"
+	})
+	
+	boon_database.append({
+		"id": "thoth_hieroglyph_power",
+		"name": "Hieroglyph Power",
+		"description": "Defeating enemies leaves magical symbols that boost damage.",
+		"god": BoonGod.THOTH,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 4,
+		"effects": {
+			"symbol_damage_bonus": [5, 10, 15, 20],
+			"symbol_duration": [8, 10, 12, 15],
+			"max_symbols": [3, 4, 5, 6]
+		},
+		"icon": "res://icons/boons/thoth_hieroglyph_power.png"
+	})
+	
+	boon_database.append({
+		"id": "thoth_time_dilation",
+		"name": "Time Dilation",
+		"description": "Critical hits slow down time briefly.",
+		"god": BoonGod.THOTH,
+		"type": BoonType.SPECIAL,
+		"rarity": BoonRarity.EPIC,
+		"max_stacks": 2,
+		"effects": {
+			"slow_factor": [0.3, 0.2],  # Time scale
+			"slow_duration": [1.5, 2.5]
+		},
+		"icon": "res://icons/boons/thoth_time_dilation.png"
+	})
+	
+	boon_database.append({
+		"id": "thoth_wisdom_barrier",
+		"name": "Wisdom Barrier",
+		"description": "High mana grants damage reduction.",
+		"god": BoonGod.THOTH,
+		"type": BoonType.DEFENSE,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 3,
+		"effects": {
+			"mana_threshold": [75, 60, 50],  # Percentage of max mana
+			"damage_reduction": [20, 30, 40]
+		},
+		"icon": "res://icons/boons/thoth_wisdom_barrier.png"
+	})
+	
+	boon_database.append({
+		"id": "thoth_spell_weaving",
+		"name": "Spell Weaving",
+		"description": "Using different abilities in sequence grants stacking damage.",
+		"god": BoonGod.THOTH,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.RARE,
+		"max_stacks": 2,
+		"effects": {
+			"weave_damage_bonus": [15, 25],
+			"max_weave_stacks": [4, 6],
+			"sequence_window": [3, 4]
+		},
+		"icon": "res://icons/boons/thoth_spell_weaving.png"
+	})
+	
+	boon_database.append({
+		"id": "thoth_forbidden_knowledge",
+		"name": "Forbidden Knowledge",
+		"description": "See enemy health bars and attack patterns.",
+		"god": BoonGod.THOTH,
+		"type": BoonType.UTILITY,
+		"rarity": BoonRarity.RARE,
+		"max_stacks": 1,
+		"effects": {
+			"show_enemy_health": [true],
+			"show_attack_telegraphs": [true],
+			"prediction_time": [2.0]
+		},
+		"icon": "res://icons/boons/thoth_forbidden_knowledge.png"
+	})
+	
+	boon_database.append({
+		"id": "thoth_astral_projection",
+		"name": "Astral Projection",
+		"description": "Dash grants brief invincibility and phases through enemies.",
+		"god": BoonGod.THOTH,
+		"type": BoonType.UTILITY,
+		"rarity": BoonRarity.EPIC,
+		"max_stacks": 2,
+		"effects": {
+			"invincibility_duration": [0.5, 0.8],
+			"phase_damage": [20, 35]
+		},
+		"icon": "res://icons/boons/thoth_astral_projection.png"
+	})
+	
+	boon_database.append({
+		"id": "thoth_infinite_wisdom",
+		"name": "Infinite Wisdom",
+		"description": "Abilities no longer consume mana, but have longer cooldowns.",
+		"god": BoonGod.THOTH,
+		"type": BoonType.SPECIAL,
+		"rarity": BoonRarity.LEGENDARY,
+		"max_stacks": 1,
+		"effects": {
+			"no_mana_cost": [true],
+			"cooldown_penalty": [1.5]  # 50% longer cooldowns
+		},
+		"icon": "res://icons/boons/thoth_infinite_wisdom.png"
 	})
 
 func add_bastet_boons():
@@ -476,6 +722,134 @@ func add_bastet_boons():
 		},
 		"icon": "res://icons/boons/bastet_hunters_instinct.png"
 	})
+	
+	# NEW BASTET BOONS - EXPANSION
+	boon_database.append({
+		"id": "bastet_shadow_step",
+		"name": "Shadow Step",
+		"description": "Dash makes you invisible and increases critical hit chance.",
+		"god": BoonGod.BASTET,
+		"type": BoonType.UTILITY,
+		"rarity": BoonRarity.EPIC,
+		"max_stacks": 2,
+		"effects": {
+			"invisibility_duration": [1.5, 2.5],
+			"crit_chance_bonus": [30, 50]
+		},
+		"icon": "res://icons/boons/bastet_shadow_step.png"
+	})
+	
+	boon_database.append({
+		"id": "bastet_agility_training",
+		"name": "Agility Training",
+		"description": "Attack speed increases with consecutive hits.",
+		"god": BoonGod.BASTET,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 4,
+		"effects": {
+			"attack_speed_per_hit": [8, 12, 16, 20],
+			"max_speed_stacks": [5, 6, 7, 8],
+			"stack_decay_time": [3, 4, 5, 6]
+		},
+		"icon": "res://icons/boons/bastet_agility_training.png"
+	})
+	
+	boon_database.append({
+		"id": "bastet_sacred_claws",
+		"name": "Sacred Claws",
+		"description": "Attacks apply bleeding that stacks infinitely.",
+		"god": BoonGod.BASTET,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.RARE,
+		"max_stacks": 3,
+		"effects": {
+			"bleed_damage_per_stack": [3, 5, 7],
+			"bleed_duration": [6, 8, 10],
+			"application_chance": [60, 80, 100]
+		},
+		"icon": "res://icons/boons/bastet_sacred_claws.png"
+	})
+	
+	boon_database.append({
+		"id": "bastet_guardian_spirit",
+		"name": "Guardian Spirit",
+		"description": "Summons a cat spirit that fights alongside you.",
+		"god": BoonGod.BASTET,
+		"type": BoonType.SPECIAL,
+		"rarity": BoonRarity.LEGENDARY,
+		"max_stacks": 1,
+		"effects": {
+			"spirit_damage": [25],
+			"spirit_health": [200],
+			"spirit_speed": [1.5]
+		},
+		"icon": "res://icons/boons/bastet_guardian_spirit.png"
+	})
+	
+	boon_database.append({
+		"id": "bastet_perfect_balance",
+		"name": "Perfect Balance",
+		"description": "Cannot be knocked down or stunned.",
+		"god": BoonGod.BASTET,
+		"type": BoonType.DEFENSE,
+		"rarity": BoonRarity.EPIC,
+		"max_stacks": 1,
+		"effects": {
+			"knockdown_immunity": [true],
+			"stun_immunity": [true],
+			"stability_bonus": [100]
+		},
+		"icon": "res://icons/boons/bastet_perfect_balance.png"
+	})
+	
+	boon_database.append({
+		"id": "bastet_night_vision",
+		"name": "Night Vision",
+		"description": "See enemies through walls and detect traps.",
+		"god": BoonGod.BASTET,
+		"type": BoonType.UTILITY,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 2,
+		"effects": {
+			"wall_vision_range": [10, 15],
+			"trap_detection": [true],
+			"enemy_outline": [true]
+		},
+		"icon": "res://icons/boons/bastet_night_vision.png"
+	})
+	
+	boon_database.append({
+		"id": "bastet_pounce_attack",
+		"name": "Pounce Attack",
+		"description": "Dash through enemies deals damage based on distance traveled.",
+		"god": BoonGod.BASTET,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.RARE,
+		"max_stacks": 3,
+		"effects": {
+			"damage_per_unit": [8, 12, 16],
+			"max_pounce_damage": [80, 120, 160],
+			"stun_duration": [0.5, 0.7, 1.0]
+		},
+		"icon": "res://icons/boons/bastet_pounce_attack.png"
+	})
+	
+	boon_database.append({
+		"id": "bastet_territorial_instinct",
+		"name": "Territorial Instinct",
+		"description": "Deal more damage when staying in the same area.",
+		"god": BoonGod.BASTET,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 4,
+		"effects": {
+			"territory_radius": [8, 10, 12, 15],
+			"damage_bonus": [10, 20, 30, 40],
+			"buildup_time": [3, 2.5, 2, 1.5]
+		},
+		"icon": "res://icons/boons/bastet_territorial_instinct.png"
+	})
 
 func add_set_boons():
 	# Set - Chaos and Corruption boons
@@ -553,6 +927,134 @@ func add_set_boons():
 			"mana_per_kill": [15, 20, 30]
 		},
 		"icon": "res://icons/boons/set_soul_harvest.png"
+	})
+	
+	# NEW SET BOONS - EXPANSION  
+	boon_database.append({
+		"id": "set_desert_storm",
+		"name": "Desert Storm",
+		"description": "Dash creates a sandstorm that blinds and damages enemies.",
+		"god": BoonGod.SET,
+		"type": BoonType.SPECIAL,
+		"rarity": BoonRarity.EPIC,
+		"max_stacks": 2,
+		"effects": {
+			"storm_damage": [15, 25],
+			"storm_duration": [4, 6],
+			"blind_duration": [3, 5]
+		},
+		"icon": "res://icons/boons/set_desert_storm.png"
+	})
+	
+	boon_database.append({
+		"id": "set_blood_for_power",
+		"name": "Blood for Power",
+		"description": "Sacrifice health to instantly refresh all ability cooldowns.",
+		"god": BoonGod.SET,
+		"type": BoonType.UTILITY,
+		"rarity": BoonRarity.RARE,
+		"max_stacks": 3,
+		"effects": {
+			"health_cost": [20, 15, 10],
+			"cooldown_refresh": [true],
+			"usage_limit": [2, 3, 4]  # Uses per room
+		},
+		"icon": "res://icons/boons/set_blood_for_power.png"
+	})
+	
+	boon_database.append({
+		"id": "set_plague_bearer",
+		"name": "Plague Bearer",
+		"description": "Poisoned enemies spread poison to nearby enemies on death.",
+		"god": BoonGod.SET,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 3,
+		"effects": {
+			"spread_radius": [4, 6, 8],
+			"spread_damage": [20, 35, 50],
+			"spread_duration": [4, 5, 6]
+		},
+		"icon": "res://icons/boons/set_plague_bearer.png"
+	})
+	
+	boon_database.append({
+		"id": "set_cursed_weapons",
+		"name": "Cursed Weapons",
+		"description": "Weapons drain enemy health over time on hit.",
+		"god": BoonGod.SET,
+		"type": BoonType.DAMAGE,
+		"rarity": BoonRarity.COMMON,
+		"max_stacks": 4,
+		"effects": {
+			"curse_damage": [5, 8, 12, 16],
+			"curse_duration": [6, 7, 8, 10],
+			"curse_chance": [40, 60, 80, 100]
+		},
+		"icon": "res://icons/boons/set_cursed_weapons.png"
+	})
+	
+	boon_database.append({
+		"id": "set_shadow_clone",
+		"name": "Shadow Clone",
+		"description": "Create a dark copy that mimics your attacks.",
+		"god": BoonGod.SET,
+		"type": BoonType.SPECIAL,
+		"rarity": BoonRarity.LEGENDARY,
+		"max_stacks": 1,
+		"effects": {
+			"clone_damage": [0.75],
+			"clone_duration": [30],
+			"clone_health": [150]
+		},
+		"icon": "res://icons/boons/set_shadow_clone.png"
+	})
+	
+	boon_database.append({
+		"id": "set_vampiric_strikes",
+		"name": "Vampiric Strikes",
+		"description": "Heal for a percentage of damage dealt.",
+		"god": BoonGod.SET,
+		"type": BoonType.DEFENSE,
+		"rarity": BoonRarity.RARE,
+		"max_stacks": 3,
+		"effects": {
+			"lifesteal_percentage": [8, 15, 25],
+			"max_heal_per_hit": [20, 35, 50]
+		},
+		"icon": "res://icons/boons/set_vampiric_strikes.png"
+	})
+	
+	boon_database.append({
+		"id": "set_chaos_magic",
+		"name": "Chaos Magic",
+		"description": "Abilities have random enhanced effects each use.",
+		"god": BoonGod.SET,
+		"type": BoonType.SPECIAL,
+		"rarity": BoonRarity.EPIC,
+		"max_stacks": 2,
+		"effects": {
+			"enhancement_chance": [50, 75],
+			"possible_effects": ["double_damage", "no_cooldown", "area_boost", "free_cast"]
+		},
+		"icon": "res://icons/boons/set_chaos_magic.png"
+	})
+	
+	boon_database.append({
+		"id": "set_forbidden_ritual",
+		"name": "Forbidden Ritual",
+		"description": "Constantly lose health but gain powerful regeneration and damage.",
+		"god": BoonGod.SET,
+		"type": BoonType.SPECIAL,
+		"rarity": BoonRarity.LEGENDARY,
+		"max_stacks": 1,
+		"effects": {
+			"health_drain": [2],  # Per second
+			"damage_bonus": [50],
+			"regeneration": [8],  # Per second when not taking damage
+			"regeneration_delay": [3]
+		},
+		"icon": "res://icons/boons/set_forbidden_ritual.png"
 	})
 
 # Boon selection and application

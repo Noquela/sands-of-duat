@@ -1,18 +1,18 @@
-[gd_scene load_steps=11 format=3 uid="uid://dndsi7bjifdgq"]
+[gd_scene load_steps=18 format=3 uid="uid://dndsi7bjifdgq"]
 
 [ext_resource type="PackedScene" uid="uid://bd2j6y26cjocm" path="res://scenes/player/Player.tscn" id="1_5tc3j"]
 [ext_resource type="Script" uid="uid://c24ng0omogcg0" path="res://scripts/camera/IsometricCameraFollow.gd" id="2_8sv7l"]
 [ext_resource type="Script" uid="uid://cyidin7x137td" path="res://scripts/systems/EnemySpawner.gd" id="3_spawner"]
-[ext_resource type="Script" path="res://scripts/systems/RoomSystem.gd" id="4_room"]
-[ext_resource type="Script" path="res://scripts/systems/SaveSystem.gd" id="5_save"]
-[ext_resource type="Script" path="res://scripts/ui/MiniMap.gd" id="6_minimap"]
-[ext_resource type="Script" path="res://scripts/systems/BoonSystem.gd" id="7_boon"]
-[ext_resource type="Script" path="res://scripts/ui/BoonSelectionUI.gd" id="8_boon_ui"]
-[ext_resource type="Script" path="res://scripts/systems/RewardSystem.gd" id="9_reward"]
-[ext_resource type="Script" path="res://scripts/ui/RewardSelectionUI.gd" id="10_reward_ui"]
-[ext_resource type="Script" path="res://scripts/systems/StatusEffectSystem.gd" id="11_status"]
-[ext_resource type="Script" path="res://scripts/systems/WallSlamSystem.gd" id="12_wall_slam"]
-[ext_resource type="Script" path="res://scripts/systems/BossEncounter.gd" id="13_boss_encounter"]
+[ext_resource type="Script" uid="uid://ctbiyrbpo0gc2" path="res://scripts/systems/RoomSystem.gd" id="4_room"]
+[ext_resource type="Script" uid="uid://bky68ku5pynpk" path="res://scripts/systems/SaveSystem.gd" id="5_save"]
+[ext_resource type="Script" uid="uid://t5s2ywrmg35n" path="res://scripts/ui/MiniMap.gd" id="6_minimap"]
+[ext_resource type="Script" uid="uid://gthghgweytd2" path="res://scripts/systems/BoonSystem.gd" id="7_boon"]
+[ext_resource type="Script" uid="uid://dgyidboh1mo81" path="res://scripts/ui/BoonSelectionUI.gd" id="8_boon_ui"]
+[ext_resource type="Script" uid="uid://3v6o5yqr246v" path="res://scripts/systems/RewardSystem.gd" id="9_reward"]
+[ext_resource type="Script" uid="uid://rej5y7kmmrku" path="res://scripts/ui/RewardSelectionUI.gd" id="10_reward_ui"]
+[ext_resource type="Script" uid="uid://bx54vi3iwi3sa" path="res://scripts/systems/StatusEffectSystem.gd" id="11_status"]
+[ext_resource type="Script" uid="uid://cu2rjxrab5yw5" path="res://scripts/systems/WallSlamSystem.gd" id="12_wall_slam"]
+[ext_resource type="Script" uid="uid://drrdj2pwigvsh" path="res://scripts/systems/BossEncounter.gd" id="13_boss_encounter"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7nmaj"]
 size = Vector2(20, 20)
@@ -85,6 +85,7 @@ script = ExtResource("13_boss_encounter")
 
 [node name="MiniMap" type="Control" parent="UI"]
 layout_mode = 3
+anchors_preset = 0
 script = ExtResource("6_minimap")
 
 [node name="BoonSelectionUI" type="Control" parent="UI"]
@@ -92,6 +93,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("8_boon_ui")
 
 [node name="RewardSelectionUI" type="Control" parent="UI"]
@@ -99,6 +102,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("10_reward_ui")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]

@@ -173,8 +173,8 @@ func collect_player_data() -> Dictionary:
 	# Get weapon from weapon system
 	if player.has_method("get_node") and player.get_node_or_null("WeaponSystem"):
 		var weapon_system = player.get_node("WeaponSystem")
-		if weapon_system and weapon_system.has_method("get_current_weapon"):
-			player_data.equipped_weapon = weapon_system.get_current_weapon()
+		if weapon_system and weapon_system.has_method("get_current_weapon_data"):
+			player_data.equipped_weapon = weapon_system.current_weapon
 	
 	return player_data
 

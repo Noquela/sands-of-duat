@@ -82,10 +82,10 @@ func perform_attack(attacker: CharacterBody3D):
 		attack_direction = -attacker.transform.basis.z
 	
 	# Check if using bow for ranged attack
-	var weapon_system = attacker.weapon_system
-	var current_weapon = weapon_system.get_current_weapon() if weapon_system else null
+	var weapon_system = attacker.get_node_or_null("WeaponSystem")
+	var current_weapon_data = weapon_system.get_current_weapon_data() if weapon_system else null
 	
-	if current_weapon and current_weapon.name == "Egyptian Bow":
+	if current_weapon_data and current_weapon_data.name == "Bow of Winds":
 		# Fire projectile
 		fire_projectile(attack_origin, attack_direction, attack_damage * damage_multiplier)
 	else:
