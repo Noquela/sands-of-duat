@@ -267,7 +267,7 @@ func create_door(room_instance: Node3D, door_position: Vector3, target_room_id: 
 	# Connect door signal
 	door_area.body_entered.connect(_on_door_entered.bind(target_room_id))
 
-func setup_room_content(_room_instance: Node3D, room_data: Dictionary):
+func setup_room_content(room_instance: Node3D, room_data: Dictionary):
 	var layout = get_room_layout(room_data.type, room_data.layout_id)
 	
 	# Add spawn points
@@ -275,6 +275,10 @@ func setup_room_content(_room_instance: Node3D, room_data: Dictionary):
 	
 	# Add reward points  
 	room_data.reward_points = layout.reward_points.duplicate()
+	
+	# Special handling for boss rooms
+	if room_data.type == RoomType.BOSS:
+		spawn_boss_arena(room_instance, room_data)
 	
 	# Spawn points stored in room_data for enemy spawning
 	# No visual markers needed
@@ -355,6 +359,41 @@ func generate_boss_layout(layout_id: int) -> Dictionary:
 	layout.reward_points.append(Vector3(0, 0.5, 0))
 	
 	return layout
+
+func spawn_boss_arena(room_instance: Node3D, room_data: Dictionary):
+	print("Spawning boss arena in room ", room_data.id)
+	
+	# Load boss arena scene
+	var boss_arena_scene = preload("res://scenes/BossArena.tscn")
+	var boss_arena = boss_arena_scene.instantiate()
+	
+	# Position boss arena in room center
+	boss_arena.position = Vector3(0, 0, 0)
+	room_instance.add_child(boss_arena)
+	
+	# Connect boss encounter system
+	setup_boss_encounter(boss_arena)
+	
+	print("Boss arena spawned successfully!")
+
+func setup_boss_encounter(boss_arena: Node3D):
+	var boss_encounter = get_tree().get_first_node_in_group("boss_encounter")
+	if boss_encounter:
+		# Connect the trigger area
+		var trigger = boss_arena.get_node_or_null("BossIntroTrigger")
+		if trigger and trigger.has_signal("body_entered"):
+			trigger.body_entered.connect(_on_boss_intro_trigger)
+		
+		# Let boss encounter system know about the arena
+		boss_encounter.setup_boss_arena_from_scene()
+		print("Boss encounter connected to arena")
+
+func _on_boss_intro_trigger(body: Node3D):
+	if body.is_in_group("player"):
+		var boss_encounter = get_tree().get_first_node_in_group("boss_encounter")
+		if boss_encounter and boss_encounter.has_method("trigger_boss_encounter"):
+			boss_encounter.trigger_boss_encounter()
+		print("Boss encounter triggered!")
 
 # Room transition system
 func _on_door_entered(body: Node3D, target_room_id: int):

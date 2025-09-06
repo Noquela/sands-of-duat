@@ -1,0 +1,95 @@
+[gd_scene load_steps=6 format=3 uid="uid://boss_arena_khaemwaset"]
+
+[ext_resource type="Script" path="res://scripts/enemies/Khaemwaset.gd" id="1_boss"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_arena"]
+size = Vector2(32, 32)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_arena"]
+size = Vector3(32, 0.2, 32)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_boss"]
+height = 3.0
+top_radius = 0.8
+bottom_radius = 0.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_boss"]
+height = 3.0
+radius = 0.8
+
+[node name="BossArena" type="Node3D"]
+
+[node name="ArenaFloor" type="StaticBody3D" parent="."]
+collision_layer = 4
+
+[node name="ArenaFloorMesh" type="MeshInstance3D" parent="ArenaFloor"]
+mesh = SubResource("PlaneMesh_arena")
+
+[node name="ArenaFloorCollision" type="CollisionShape3D" parent="ArenaFloor"]
+shape = SubResource("BoxShape3D_arena")
+
+[node name="ArenaWalls" type="Node3D" parent="."]
+
+[node name="NorthWall" type="StaticBody3D" parent="ArenaWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 16)
+collision_layer = 4
+
+[node name="NorthWallMesh" type="MeshInstance3D" parent="ArenaWalls/NorthWall"]
+transform = Transform3D(32, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("PlaneMesh_arena")
+
+[node name="NorthWallCollision" type="CollisionShape3D" parent="ArenaWalls/NorthWall"]
+shape = SubResource("BoxShape3D_arena")
+
+[node name="SouthWall" type="StaticBody3D" parent="ArenaWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -16)
+collision_layer = 4
+
+[node name="SouthWallMesh" type="MeshInstance3D" parent="ArenaWalls/SouthWall"]
+transform = Transform3D(32, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("PlaneMesh_arena")
+
+[node name="SouthWallCollision" type="CollisionShape3D" parent="ArenaWalls/SouthWall"]
+shape = SubResource("BoxShape3D_arena")
+
+[node name="EastWall" type="StaticBody3D" parent="ArenaWalls"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 16, 2, 0)
+collision_layer = 4
+
+[node name="EastWallMesh" type="MeshInstance3D" parent="ArenaWalls/EastWall"]
+transform = Transform3D(32, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("PlaneMesh_arena")
+
+[node name="EastWallCollision" type="CollisionShape3D" parent="ArenaWalls/EastWall"]
+shape = SubResource("BoxShape3D_arena")
+
+[node name="WestWall" type="StaticBody3D" parent="ArenaWalls/WestWall"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -16, 2, 0)
+collision_layer = 4
+
+[node name="WestWallMesh" type="MeshInstance3D" parent="ArenaWalls/WestWall"]
+transform = Transform3D(32, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("PlaneMesh_arena")
+
+[node name="WestWallCollision" type="CollisionShape3D" parent="ArenaWalls/WestWall"]
+shape = SubResource("BoxShape3D_arena")
+
+[node name="Khaemwaset" type="CharacterBody3D" parent="." groups=["enemies", "boss"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 8)
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_boss")
+
+[node name="BossMesh" type="MeshInstance3D" parent="Khaemwaset"]
+mesh = SubResource("CapsuleMesh_boss")
+
+[node name="BossCollision" type="CollisionShape3D" parent="Khaemwaset"]
+shape = SubResource("CapsuleShape3D_boss")
+
+[node name="BossIntroTrigger" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -12)
+collision_layer = 0
+collision_mask = 1
+
+[node name="TriggerShape" type="CollisionShape3D" parent="BossIntroTrigger"]
+shape = SubResource("BoxShape3D_arena")
