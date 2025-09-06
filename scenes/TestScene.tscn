@@ -1,8 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://dndsi7bjifdgq"]
+[gd_scene load_steps=11 format=3 uid="uid://dndsi7bjifdgq"]
 
 [ext_resource type="PackedScene" uid="uid://bd2j6y26cjocm" path="res://scenes/player/Player.tscn" id="1_5tc3j"]
 [ext_resource type="Script" uid="uid://c24ng0omogcg0" path="res://scripts/camera/IsometricCameraFollow.gd" id="2_8sv7l"]
 [ext_resource type="Script" uid="uid://cyidin7x137td" path="res://scripts/systems/EnemySpawner.gd" id="3_spawner"]
+[ext_resource type="Script" path="res://scripts/systems/RoomSystem.gd" id="4_room"]
+[ext_resource type="Script" path="res://scripts/systems/SaveSystem.gd" id="5_save"]
+[ext_resource type="Script" path="res://scripts/ui/MiniMap.gd" id="6_minimap"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7nmaj"]
 size = Vector2(20, 20)
@@ -51,16 +54,16 @@ navigation_mesh = SubResource("NavigationMesh_1")
 script = ExtResource("3_spawner")
 
 [node name="RoomSystem" type="Node3D" parent="."]
-script = preload("res://scripts/systems/RoomSystem.gd")
+script = ExtResource("4_room")
 
 [node name="SaveSystem" type="Node" parent="."]
-script = preload("res://scripts/systems/SaveSystem.gd")
+script = ExtResource("5_save")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="MiniMap" type="Control" parent="UI"]
 layout_mode = 3
-script = preload("res://scripts/ui/MiniMap.gd")
+script = ExtResource("6_minimap")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1")

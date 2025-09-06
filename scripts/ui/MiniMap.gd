@@ -77,12 +77,12 @@ func find_room_system():
 	else:
 		print("Warning: RoomSystem not found for minimap")
 
-func find_node_by_class(node: Node, class_name: String) -> Node:
-	if node.get_script() and node.get_script().get_global_name() == class_name:
+func find_node_by_class(node: Node, target_class: String) -> Node:
+	if node.get_script() and node.get_script().get_global_name() == target_class:
 		return node
 	
 	for child in node.get_children():
-		var result = find_node_by_class(child, class_name)
+		var result = find_node_by_class(child, target_class)
 		if result:
 			return result
 	
@@ -161,10 +161,10 @@ func create_room_icons(room_database: Array, layout: Dictionary):
 		var icon = create_room_icon(room, layout[room.id])
 		room_icons.append(icon)
 
-func create_room_icon(room_data: Dictionary, position: Vector2) -> Control:
+func create_room_icon(room_data: Dictionary, icon_position: Vector2) -> Control:
 	var icon = Panel.new()
 	icon.size = room_icon_size
-	icon.position = position - room_icon_size / 2
+	icon.position = icon_position - room_icon_size / 2
 	icon.name = "RoomIcon_" + str(room_data.id)
 	
 	# Style based on room type and state

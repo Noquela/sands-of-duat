@@ -4,7 +4,6 @@ class_name RoomSystem
 signal room_entered(room_data: Dictionary)
 signal room_exited(room_data: Dictionary)
 signal room_completed(room_data: Dictionary)
-signal all_rooms_completed
 
 enum RoomType {
 	COMBAT,
@@ -54,14 +53,23 @@ func _ready():
 	
 	setup_room_system()
 	initialize_room_layouts()
+	
+	# Wait a frame for player to be ready
+	call_deferred("find_player_and_start")
+
+func find_player_and_start():
 	player = get_tree().get_first_node_in_group("player")
+	
+	# Start player in room 0
+	if player:
+		transition_to_room(0)
 
 func setup_room_system():
 	# Initialize room database
 	generate_room_sequence()
 	
-	# Create first room (always combat)
-	create_room(0)
+	# Don't auto-create rooms - let them be created on demand
+	print("Room system initialized with ", room_database.size(), " rooms planned")
 
 func initialize_room_layouts():
 	# Initialize combat room layouts
@@ -137,11 +145,14 @@ func create_room(room_id: int) -> Node3D:
 	room_instance.name = "Room_" + str(room_id)
 	room_instance.position = room_data.position
 	
+	# Mark as temporary so it doesn't get saved
+	room_instance.set_owner(null)
+	
 	# Build room geometry
 	build_room_geometry(room_instance, room_data)
 	
-	# Add room to scene
-	add_child(room_instance)
+	# Add room to scene root instead of RoomSystem
+	get_tree().current_scene.add_child(room_instance)
 	room_instances.append(room_instance)
 	
 	print("Created room ", room_id, " at ", room_data.position)
@@ -160,7 +171,7 @@ func build_room_geometry(room_instance: Node3D, room_data: Dictionary):
 	# Add spawn points and rewards based on room type
 	setup_room_content(room_instance, room_data)
 
-func create_room_floor(room_instance: Node3D, room_data: Dictionary):
+func create_room_floor(room_instance: Node3D, _room_data: Dictionary):
 	var floor_body = StaticBody3D.new()
 	floor_body.name = "Floor"
 	floor_body.collision_layer = 4  # Environment layer
@@ -180,7 +191,7 @@ func create_room_floor(room_instance: Node3D, room_data: Dictionary):
 	floor_body.add_child(floor_collision)
 	room_instance.add_child(floor_body)
 
-func create_room_walls(room_instance: Node3D, room_data: Dictionary):
+func create_room_walls(room_instance: Node3D, _room_data: Dictionary):
 	# Create 4 walls around the room
 	var wall_positions = [
 		Vector3(0, room_size.y/2, room_size.z/2),      # North
@@ -367,6 +378,10 @@ func transition_to_room(room_id: int):
 	if room_id >= room_database.size():
 		print("Error: Cannot transition to room ", room_id)
 		return
+	
+	# Create first room if transitioning to room 0 for the first time
+	if room_id == 0 and current_room.is_empty():
+		create_room(0)
 	
 	# Check if room exists, create if not
 	if room_id >= room_instances.size() or room_instances[room_id] == null:

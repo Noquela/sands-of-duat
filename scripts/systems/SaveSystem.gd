@@ -49,12 +49,12 @@ func find_game_references():
 	
 	print("Save system references - RoomSystem: ", room_system != null, " Player: ", player != null)
 
-func find_node_by_class(node: Node, class_name: String) -> Node:
-	if node.get_script() and node.get_script().get_global_name() == class_name:
+func find_node_by_class(node: Node, target_class: String) -> Node:
+	if node.get_script() and node.get_script().get_global_name() == target_class:
 		return node
 	
 	for child in node.get_children():
-		var result = find_node_by_class(child, class_name)
+		var result = find_node_by_class(child, target_class)
 		if result:
 			return result
 	
