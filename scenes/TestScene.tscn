@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://b4vhsovwvnr5n"]
 
-[ext_resource type="Script" path="res://scripts/core/TestSceneController.gd" id="1_dkb2n"]
+[ext_resource type="Script" uid="uid://dm25a03tluivu" path="res://scripts/core/TestSceneController.gd" id="1_dkb2n"]
 
 [sub_resource type="Environment" id="Environment_1nh4g"]
 background_mode = 1
@@ -20,7 +20,6 @@ environment = SubResource("Environment_1nh4g")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 0, 0)
-light_energy = 1.0
 shadow_enabled = true
 
 [node name="Ground" type="StaticBody3D" parent="."]
@@ -29,19 +28,20 @@ shadow_enabled = true
 mesh = SubResource("BoxMesh_k1d4h")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
-shape = SubResource("BoxMesh_k1d4h")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 10, 10)
 projection = 1
-size = 20.0
 fov = 45.0
+size = 20.0
 
 [node name="UI" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Label" type="Label" parent="UI"]
 layout_mode = 1
@@ -52,7 +52,8 @@ offset_left = 20.0
 offset_top = -60.0
 offset_right = 500.0
 offset_bottom = -20.0
-text = "Sands of Duat - Sprint 1: Setup Complete
-Godot 4.3 - 3D Isometric ARPG"
+grow_vertical = 0
 theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
 theme_override_font_sizes/font_size = 16
+text = "Sands of Duat - Sprint 1: Setup Complete
+Godot 4.3 - 3D Isometric ARPG"

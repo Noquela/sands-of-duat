@@ -1,0 +1,84 @@
+[gd_scene load_steps=7 format=3 uid="uid://b8yqwn1dxhj7x"]
+
+[ext_resource type="PackedScene" uid="uid://cqsb6yw86j2rl" path="res://scenes/player/Player.tscn" id="1_p3q8s"]
+[ext_resource type="Script" path="res://scripts/camera/IsometricCameraFollow.gd" id="2_l4mxd"]
+[ext_resource type="Script" path="res://scripts/core/GameController.gd" id="3_gamecontroller"]
+
+[sub_resource type="Environment" id="Environment_1nh4g"]
+background_mode = 1
+background_color = Color(0.2, 0.15, 0.1, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.8, 0.7, 0.5, 1)
+ambient_light_energy = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(20, 0.2, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(20, 0.2, 20)
+
+[node name="GameScene" type="Node3D"]
+script = ExtResource("3_gamecontroller")
+
+[node name="Player" parent="." instance=ExtResource("1_p3q8s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="IsometricCamera" type="Camera3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 8.485, 8, 8.485)
+projection = 1
+size = 20.0
+script = ExtResource("2_l4mxd")
+target = NodePath("../Player")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1nh4g")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 0, 0)
+light_energy = 1.0
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="."]
+collision_layer = 4
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("BoxMesh_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("BoxShape3D_ground")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="DebugPanel" type="Panel" parent="UI"]
+layout_mode = 1
+anchors_preset = 0
+anchor_left = 0.02
+anchor_top = 0.02
+anchor_right = 0.35
+anchor_bottom = 0.25
+color = Color(0, 0, 0, 0.5)
+
+[node name="DebugLabel" type="Label" parent="UI/DebugPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
+theme_override_font_sizes/font_size = 16
+text = "SANDS OF DUAT - Sprint 2
+Player Controller Base
+
+🎮 Controls:
+WASD - Movement  
+F2 - Player Info
+F3 - Camera Info
+
+🏺 Khenti moves smoothly
+📹 Camera follows isometrically
+⚡ 60fps target maintained"
+vertical_alignment = 1

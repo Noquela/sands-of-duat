@@ -1,4 +1,1 @@
-res://scenes/MainGameScene.tscn
-res://scripts/systems/CameraController3D.gd
-res://scripts/systems/WeaponSystem.gd
-res://scripts/combat/StatusEffects.gd
+res://scenes/TestScene.tscn
