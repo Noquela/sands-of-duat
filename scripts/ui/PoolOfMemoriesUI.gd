@@ -5,8 +5,11 @@ signal upgrade_selected(upgrade_id: String)
 signal category_changed(category: String)
 signal exit_pool()
 
-# UI Elements
-@onready var memory_fragments_label: Label = $VBox/Header/FragmentsLabel
+# UI Elements - Constellation Style
+@onready var constellation_container: Control = $ConstellationView
+@onready var currency_display: HBoxContainer = $CurrencyBar
+@onready var upgrade_tooltip: Panel = $UpgradeTooltip
+@onready var constellation_lines: Control = $ConstellationView/ConnectionLines
 @onready var category_tabs: TabContainer = $VBox/Content/CategoryTabs
 @onready var upgrade_grid: GridContainer = $VBox/Content/CategoryTabs/Health/ScrollContainer/UpgradeGrid
 @onready var upgrade_info_panel: Panel = $VBox/Content/InfoPanel

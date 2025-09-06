@@ -6,7 +6,11 @@
 
 [node name="PoolFloor" type="MeshInstance3D" parent="Environment"]
 
+[node name="PoolReflection" type="MeshInstance3D" parent="Environment"]
+
 [node name="MemoryStations" type="Node3D" parent="."]
+
+[node name="MemoryStation1" type="MeshInstance3D" parent="MemoryStations"]
 
 [node name="MemoryUI" type="Control" parent="."]
 layout_mode = 3

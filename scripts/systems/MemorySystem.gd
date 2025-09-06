@@ -14,10 +14,16 @@ signal memory_upgrade_unlocked(upgrade_id: String)
 @export_group("Save System")
 @export var save_file_path: String = "user://memory_progress.save"
 
-# Memory Fragment tracking
-var total_memory_fragments: int = 0
+# Currency tracking - 4 types as per Sprint 12 spec
+var total_memory_fragments: int = 0  # Meta progression currency
 var lifetime_fragments_earned: int = 0
 var current_run_fragments: int = 0
+
+# Additional currencies from ROADMAP Sprint 12
+var ankh_fragments: int = 0        # Common - Fragmentos de vida
+var golden_scarabs: int = 0        # Rare - Proteção divina  
+var heart_pieces: int = 0          # Boss - Essência emocional
+var memory_shards: int = 0         # Meta - Lembranças importantes
 
 # Memory upgrades database
 var memory_upgrades: Dictionary = {}
@@ -297,6 +303,92 @@ func initialize_memory_upgrades():
 		"prerequisites": ["memory_status_2"]
 	}
 	
+# ADDITIONAL MEMORY UPGRADES (Sprint 12 - reaching 30+ total)
+	
+	# COMBO & TECHNIQUE MEMORIES
+	memory_upgrades["memory_combo_1"] = {
+		"name": "Desert Fighting Style", 
+		"description": "Recall training with Nubian warriors. Combo attacks are 20% faster.",
+		"cost": 35,
+		"category": "weapons",
+		"tier": 2,
+		"effects": {"combo_speed_bonus": 0.2},
+		"prerequisites": ["memory_weapons_1"]
+	}
+	
+	memory_upgrades["memory_combo_2"] = {
+		"name": "Royal Combat Mastery",
+		"description": "Remember palace sparring sessions. Perfect combos grant brief invincibility.",
+		"cost": 60,
+		"category": "weapons", 
+		"tier": 3,
+		"effects": {"perfect_combo_invincibility": 1.0},
+		"prerequisites": ["memory_combo_1"]
+	}
+	
+	# EXPLORATION & DISCOVERY MEMORIES
+	memory_upgrades["memory_explore_1"] = {
+		"name": "Tomb Raider's Instinct",
+		"description": "Recall secret passage discoveries. See hidden treasures through walls.",
+		"cost": 25,
+		"category": "special",
+		"tier": 1, 
+		"effects": {"treasure_vision": true, "hidden_detection_range": 10.0},
+		"prerequisites": []
+	}
+	
+	memory_upgrades["memory_explore_2"] = {
+		"name": "Archaeologist's Wisdom",
+		"description": "Remember scholarly expeditions. All containers hold 50% more loot.",
+		"cost": 45,
+		"category": "wealth",
+		"tier": 2,
+		"effects": {"loot_quantity_bonus": 0.5},
+		"prerequisites": ["memory_explore_1"]
+	}
+	
+	# MAGICAL RESISTANCE MEMORIES  
+	memory_upgrades["memory_magic_1"] = {
+		"name": "Priest's Blessing",
+		"description": "Recall temple consecrations. 30% resistance to magical damage.",
+		"cost": 40,
+		"category": "status",
+		"tier": 2,
+		"effects": {"magic_resistance": 0.3},
+		"prerequisites": ["memory_status_1"]
+	}
+	
+	memory_upgrades["memory_magic_2"] = {
+		"name": "Divine Ward",
+		"description": "Channel protective rituals. Reflect 25% of magical damage back to casters.", 
+		"cost": 75,
+		"category": "status",
+		"tier": 3,
+		"effects": {"spell_reflection": 0.25},
+		"prerequisites": ["memory_magic_1"]
+	}
+	
+	# SOCIAL & DIPLOMATIC MEMORIES
+	memory_upgrades["memory_social_1"] = {
+		"name": "Noble Bearing",
+		"description": "Remember royal court etiquette. Merchants offer 15% better prices.",
+		"cost": 30,
+		"category": "wealth",
+		"tier": 2,
+		"effects": {"merchant_discount": 0.15},
+		"prerequisites": ["memory_wealth_1"]
+	}
+	
+	memory_upgrades["memory_social_2"] = {
+		"name": "Diplomatic Immunity", 
+		"description": "Recall peace negotiations. Some enemies refuse to attack you.",
+		"cost": 65,
+		"category": "special",
+		"tier": 3,
+		"effects": {"diplomacy_chance": 0.1, "enemy_hesitation": 0.2},
+		"prerequisites": ["memory_social_1"]
+	}
+	
 	print("Memory upgrade database initialized with ", memory_upgrades.size(), " upgrades")
 
 func award_fragments_for_run_completion(floors_cleared: int, boss_defeated: bool, perfect_run: bool):
@@ -322,6 +414,56 @@ func add_memory_fragments(amount: int):
 	
 	# Check for newly unlocked upgrades
 	check_upgrade_unlocks()
+
+# Currency management functions for all 4 types
+func add_ankh_fragments(amount: int):
+	ankh_fragments += amount
+	print("Gained ", amount, " Ankh Fragments! Total: ", ankh_fragments)
+
+func add_golden_scarabs(amount: int):
+	golden_scarabs += amount
+	print("Gained ", amount, " Golden Scarabs! Total: ", golden_scarabs)
+
+func add_heart_pieces(amount: int):
+	heart_pieces += amount
+	print("Gained ", amount, " Heart Pieces! Total: ", heart_pieces)
+
+func add_memory_shards(amount: int):
+	memory_shards += amount
+	print("Gained ", amount, " Memory Shards! Total: ", memory_shards)
+
+func spend_ankh_fragments(amount: int) -> bool:
+	if ankh_fragments >= amount:
+		ankh_fragments -= amount
+		return true
+	return false
+
+func spend_golden_scarabs(amount: int) -> bool:
+	if golden_scarabs >= amount:
+		golden_scarabs -= amount
+		return true
+	return false
+
+func spend_heart_pieces(amount: int) -> bool:
+	if heart_pieces >= amount:
+		heart_pieces -= amount
+		return true
+	return false
+
+func spend_memory_shards(amount: int) -> bool:
+	if memory_shards >= amount:
+		memory_shards -= amount
+		return true
+	return false
+
+func get_currency_totals() -> Dictionary:
+	return {
+		"memory_fragments": total_memory_fragments,
+		"ankh_fragments": ankh_fragments,
+		"golden_scarabs": golden_scarabs, 
+		"heart_pieces": heart_pieces,
+		"memory_shards": memory_shards
+	}
 
 func spend_memory_fragments(amount: int) -> bool:
 	if total_memory_fragments >= amount:
