@@ -9,7 +9,8 @@ signal mana_changed(current_mana: float, max_mana: float)
 enum AbilityType {
 	AREA_SLAM,
 	PROJECTILE_SHOT,
-	SHIELD_BLOCK
+	SHIELD_BLOCK,
+	WALL_SLAM
 }
 
 @export_group("Mana System")
@@ -18,14 +19,16 @@ enum AbilityType {
 @export var ability_mana_costs = {
 	AbilityType.AREA_SLAM: 30.0,
 	AbilityType.PROJECTILE_SHOT: 20.0,
-	AbilityType.SHIELD_BLOCK: 25.0
+	AbilityType.SHIELD_BLOCK: 25.0,
+	AbilityType.WALL_SLAM: 35.0
 }
 
 @export_group("Cooldowns")
 @export var ability_cooldowns = {
 	AbilityType.AREA_SLAM: 5.0,
 	AbilityType.PROJECTILE_SHOT: 3.0,
-	AbilityType.SHIELD_BLOCK: 4.0
+	AbilityType.SHIELD_BLOCK: 4.0,
+	AbilityType.WALL_SLAM: 6.0
 }
 
 # Current state
@@ -95,6 +98,10 @@ func handle_ability_inputs():
 	# Shield Block - R key
 	elif Input.is_action_just_pressed("ability_shield"):
 		use_ability(AbilityType.SHIELD_BLOCK)
+	
+	# Wall Slam - F key
+	elif Input.is_action_just_pressed("ability_wall_slam"):
+		use_ability(AbilityType.WALL_SLAM)
 
 func use_ability(ability_type: AbilityType) -> bool:
 	# Check if ability is available
@@ -117,6 +124,8 @@ func use_ability(ability_type: AbilityType) -> bool:
 			perform_projectile_shot()
 		AbilityType.SHIELD_BLOCK:
 			perform_shield_block()
+		AbilityType.WALL_SLAM:
+			perform_wall_slam()
 	
 	# Emit signal
 	ability_used.emit(get_ability_name(ability_type))
@@ -194,6 +203,20 @@ func perform_shield_block():
 	# Apply shield effect to player
 	apply_shield_effect(shield_duration, shield_reduction)
 
+func perform_wall_slam():
+	print("Wall Slam activated!")
+	
+	# Get wall slam system reference
+	var wall_slam_system = get_tree().get_first_node_in_group("wall_slam_system")
+	if not wall_slam_system:
+		print("Wall Slam System not found!")
+		return
+	
+	# Use the wall slam system to find and slam a target
+	var success = wall_slam_system.player_wall_slam_ability()
+	if not success:
+		print("Wall Slam failed - no valid target near walls")
+
 func launch_projectile(start_pos: Vector3, target_pos: Vector3):
 	# Create projectile (placeholder - would use actual scene)
 	print("Launching projectile from ", start_pos, " to ", target_pos)
@@ -238,6 +261,8 @@ func get_ability_name(ability_type: AbilityType) -> String:
 			return "Projectile Shot"
 		AbilityType.SHIELD_BLOCK:
 			return "Shield Block"
+		AbilityType.WALL_SLAM:
+			return "Wall Slam"
 		_:
 			return "Unknown"
 
@@ -278,6 +303,11 @@ func get_ability_info() -> Dictionary:
 				"ready": is_ability_ready(AbilityType.SHIELD_BLOCK),
 				"cooldown_progress": get_ability_cooldown_progress(AbilityType.SHIELD_BLOCK),
 				"mana_cost": ability_mana_costs.get(AbilityType.SHIELD_BLOCK)
+			},
+			"wall_slam": {
+				"ready": is_ability_ready(AbilityType.WALL_SLAM),
+				"cooldown_progress": get_ability_cooldown_progress(AbilityType.WALL_SLAM),
+				"mana_cost": ability_mana_costs.get(AbilityType.WALL_SLAM)
 			}
 		}
 	}

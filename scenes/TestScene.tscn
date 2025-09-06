@@ -10,6 +10,8 @@
 [ext_resource type="Script" path="res://scripts/ui/BoonSelectionUI.gd" id="8_boon_ui"]
 [ext_resource type="Script" path="res://scripts/systems/RewardSystem.gd" id="9_reward"]
 [ext_resource type="Script" path="res://scripts/ui/RewardSelectionUI.gd" id="10_reward_ui"]
+[ext_resource type="Script" path="res://scripts/systems/StatusEffectSystem.gd" id="11_status"]
+[ext_resource type="Script" path="res://scripts/systems/WallSlamSystem.gd" id="12_wall_slam"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7nmaj"]
 size = Vector2(20, 20)
@@ -68,6 +70,12 @@ script = ExtResource("7_boon")
 
 [node name="RewardSystem" type="Node" parent="."]
 script = ExtResource("9_reward")
+
+[node name="StatusEffectSystem" type="Node" parent="."]
+script = ExtResource("11_status")
+
+[node name="WallSlamSystem" type="Node" parent="."]
+script = ExtResource("12_wall_slam")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
