@@ -50,5 +50,17 @@ navigation_mesh = SubResource("NavigationMesh_1")
 [node name="EnemySpawner" type="Node3D" parent="."]
 script = ExtResource("3_spawner")
 
+[node name="RoomSystem" type="Node3D" parent="."]
+script = preload("res://scripts/systems/RoomSystem.gd")
+
+[node name="SaveSystem" type="Node" parent="."]
+script = preload("res://scripts/systems/SaveSystem.gd")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MiniMap" type="Control" parent="UI"]
+layout_mode = 3
+script = preload("res://scripts/ui/MiniMap.gd")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1")
