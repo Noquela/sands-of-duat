@@ -1,6 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://bd2j6y26cjocm"]
+[gd_scene load_steps=9 format=3 uid="uid://bd2j6y26cjocm"]
 
 [ext_resource type="Script" path="res://scripts/core/Player3D.gd" id="1_0hdys"]
+[ext_resource type="Script" path="res://scripts/systems/WeaponSystem.gd" id="2_weapon"]
+[ext_resource type="Script" path="res://scripts/systems/WeaponAbilities.gd" id="3_abilities"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_8gj4p"]
 
@@ -49,3 +51,9 @@ visible = false
 transform = Transform3D(0.8, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
 mesh = SubResource("CylinderMesh_bow")
 visible = false
+
+[node name="WeaponSystem" type="Node" parent="."]
+script = ExtResource("2_weapon")
+
+[node name="WeaponAbilities" type="Node" parent="."]
+script = ExtResource("3_abilities")

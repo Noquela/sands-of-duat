@@ -5,7 +5,7 @@ const JUMP_VELOCITY = 4.5
 
 # Preload combat classes
 const CombatSystemClass = preload("res://scripts/combat/CombatSystem.gd")
-const WeaponSystemClass = preload("res://scripts/combat/WeaponSystem.gd") 
+# WeaponSystem now added as child node in scene 
 const HealthSystemClass = preload("res://scripts/combat/HealthSystem.gd")
 const DashSystemClass = preload("res://scripts/systems/DashSystem.gd")
 const AbilitySystemClass = preload("res://scripts/systems/AbilitySystem.gd")
@@ -14,7 +14,7 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # Combat components
 var combat_system: CombatSystemClass
-var weapon_system: WeaponSystemClass
+var weapon_system: Node
 var health_system: HealthSystemClass
 var dash_system: DashSystemClass
 var ability_system: AbilitySystemClass
@@ -29,9 +29,15 @@ func setup_combat_systems():
 	add_child(combat_system)
 	
 	# Create weapon system
-	weapon_system = WeaponSystemClass.new()
-	add_child(weapon_system)
-	weapon_system.combat_system = combat_system
+	# Get WeaponSystem node added in scene
+	weapon_system = get_node_or_null("WeaponSystem")
+	if weapon_system:
+		weapon_system.combat_system = combat_system
+		# Connect signals for experience gain
+		if combat_system and combat_system.has_signal("attack_hit"):
+			combat_system.attack_hit.connect(_on_attack_hit)
+		if combat_system and combat_system.has_signal("enemy_killed"):
+			combat_system.enemy_killed.connect(_on_enemy_killed)
 	
 	# Create health system
 	health_system = HealthSystemClass.new()
@@ -104,13 +110,13 @@ func handle_movement(delta):
 		velocity.x = move_toward(velocity.x, 0, SPEED * 3 * delta)
 		velocity.z = move_toward(velocity.z, 0, SPEED * 3 * delta)
 	
-	# Weapon switching inputs
-	if Input.is_action_just_pressed("switch_weapon_1"):
-		weapon_system.switch_weapon("was_scepter")
-	elif Input.is_action_just_pressed("switch_weapon_2"):
-		weapon_system.switch_weapon("khopesh")
-	elif Input.is_action_just_pressed("switch_weapon_3"):
-		weapon_system.switch_weapon("egyptian_bow")
+	# Weapon switching inputs - handled by WeaponSystem itself now
+	if weapon_system:
+		weapon_system.handle_weapon_switching()
+	
+	# Special ability input - V key
+	if Input.is_action_just_pressed("ability_special") and weapon_system:
+		weapon_system.use_special_ability()
 
 # Dash system callbacks
 func _on_dash_started():
@@ -143,4 +149,13 @@ func take_damage(damage: float):
 	if health_system:
 		health_system.take_damage(damage)
 		print("Player took ", damage, " damage")
+
+# Weapon experience callbacks
+func _on_attack_hit(_enemy: Node3D):
+	if weapon_system:
+		weapon_system.gain_weapon_experience(weapon_system.current_weapon, weapon_system.mastery_exp_per_hit)
+
+func _on_enemy_killed(_enemy: Node3D):
+	if weapon_system:
+		weapon_system.gain_weapon_experience(weapon_system.current_weapon, weapon_system.mastery_exp_per_kill)
 
