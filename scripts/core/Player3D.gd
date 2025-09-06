@@ -16,10 +16,26 @@ var movement_vector: Vector3
 # References
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
+@onready var health_system: Node = $HealthSystem
+
+# Combat system reference
+var combat_system: Node
 
 func _ready():
 	print("⚔️ Khenti awakens in the Duat...")
-	print("🎮 Player Controller: Sprint 2 - WASD Movement Ready")
+	print("🎮 Player Controller: Sprint 3 - Combat Ready")
+	
+	# Get combat system reference
+	combat_system = get_node("/root/CombatSystem")
+	if not combat_system:
+		print("⚠️ Combat system not found!")
+	
+	# Setup health system
+	if health_system:
+		health_system.max_health = 100
+		health_system.current_health = 100
+		health_system.health_depleted.connect(_on_player_death)
+		print("❤️ Player health initialized: 100/100")
 	
 	# Setup placeholder mesh if none exists
 	if not mesh_instance.mesh:
@@ -66,6 +82,10 @@ func _handle_input():
 	# Normalize diagonal movement
 	if input_vector.length() > 1.0:
 		input_vector = input_vector.normalized()
+	
+	# Handle attack input
+	if Input.is_action_just_pressed("attack"):
+		_perform_attack()
 
 func _apply_movement(delta):
 	# Convert 2D input to 3D isometric movement
@@ -84,6 +104,40 @@ func _rotate_to_movement():
 		var target_rotation = atan2(-movement_vector.x, -movement_vector.z)
 		rotation.y = lerp_angle(rotation.y, target_rotation, 10.0 * get_physics_process_delta_time())
 
+func _perform_attack():
+	if not combat_system:
+		print("⚠️ No combat system available for attack")
+		return
+	
+	var attack_position = global_position + transform.basis.z * -1.0  # Attack in front
+	var attack_direction = -transform.basis.z
+	
+	if combat_system.has_method("perform_attack"):
+		var success = combat_system.perform_attack(self, attack_position, attack_direction)
+		if success:
+			print("⚔️ Khenti attacks!")
+
+# Combat methods for integration with systems
+func take_damage(amount: int, damage_type: String = "physical"):
+	if health_system and health_system.has_method("take_damage"):
+		health_system.take_damage(amount, damage_type)
+	else:
+		print("💔 Player took %d %s damage (no health system)" % [amount, damage_type])
+
+func get_health() -> int:
+	return health_system.get_health() if health_system else 100
+
+func get_max_health() -> int:
+	return health_system.get_max_health() if health_system else 100
+
+func get_attack_power() -> int:
+	return 0  # Base player has no attack bonus (weapons will add this later)
+
+func _on_player_death():
+	print("💀 Khenti has fallen in the Duat...")
+	# Handle player death - respawn, game over, etc.
+	# For Sprint 3, just print message
+	
 # Debug info
 func _input(event):
 	if event is InputEventKey and event.pressed:
@@ -93,4 +147,5 @@ func _input(event):
 				print("   Position: " + str(global_position))
 				print("   Velocity: " + str(velocity))
 				print("   Input: " + str(input_vector))
+				print("   Health: %d/%d" % [get_health(), get_max_health()])
 				print("   On Floor: " + str(is_on_floor()))

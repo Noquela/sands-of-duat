@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://cqsb6yw86j2rl"]
+[gd_scene load_steps=5 format=3 uid="uid://cqsb6yw86j2rl"]
 
 [ext_resource type="Script" path="res://scripts/core/Player3D.gd" id="1_4vfxl"]
 [ext_resource type="Material" uid="uid://b4vnt2lrj1dwq" path="res://assets/materials/egyptian_default.tres" id="2_2o8kk"]
+[ext_resource type="Script" path="res://scripts/combat/HealthSystem.gd" id="3_health"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1hdqe"]
 size = Vector3(1, 2, 1)
@@ -23,10 +24,14 @@ surface_material_override/0 = ExtResource("2_2o8kk")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("BoxShape3D_1hdqe")
 
+[node name="HealthSystem" type="Node" parent="."]
+script = ExtResource("3_health")
+max_health = 100
+
 [node name="DebugLabel" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 billboard = 1
-text = "Khenti"
+text = "Khenti [100/100]"
 font_size = 32
 outline_size = 8
 outline_color = Color(0, 0, 0, 1)

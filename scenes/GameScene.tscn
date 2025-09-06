@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://b8yqwn1dxhj7x"]
+[gd_scene load_steps=8 format=3 uid="uid://b8yqwn1dxhj7x"]
 
 [ext_resource type="PackedScene" uid="uid://cqsb6yw86j2rl" path="res://scenes/player/Player.tscn" id="1_p3q8s"]
 [ext_resource type="Script" path="res://scripts/camera/IsometricCameraFollow.gd" id="2_l4mxd"]
 [ext_resource type="Script" path="res://scripts/core/GameController.gd" id="3_gamecontroller"]
+[ext_resource type="PackedScene" uid="uid://dd6f3l6q02fdt" path="res://scenes/enemies/BasicEnemy.tscn" id="4_enemy"]
 
 [sub_resource type="Environment" id="Environment_1nh4g"]
 background_mode = 1
@@ -70,15 +71,29 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
 theme_override_font_sizes/font_size = 16
-text = "SANDS OF DUAT - Sprint 2
-Player Controller Base
+text = "SANDS OF DUAT - Sprint 3
+Combat System Base
 
 🎮 Controls:
-WASD - Movement  
+WASD - Movement
+Mouse Click - Attack
+F1 - Validate Sprint 3
 F2 - Player Info
 F3 - Camera Info
 
-🏺 Khenti moves smoothly
-📹 Camera follows isometrically
+⚔️ Combat system active
+👻 Enemies patrol and attack
+💔 Damage system functional
 ⚡ 60fps target maintained"
 vertical_alignment = 1
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="Enemy1" parent="Enemies" instance=ExtResource("4_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 3)
+
+[node name="Enemy2" parent="Enemies" instance=ExtResource("4_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 6)
+
+[node name="Enemy3" parent="Enemies" instance=ExtResource("4_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -5)

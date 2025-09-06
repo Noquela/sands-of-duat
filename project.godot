@@ -69,6 +69,10 @@ dash={
 3d_physics/layer_3="Environment"
 3d_physics/layer_4="Projectiles"
 
+[autoload]
+
+CombatSystem="*res://scripts/combat/CombatSystem.gd"
+
 [physics]
 
 3d/default_gravity=20.0
