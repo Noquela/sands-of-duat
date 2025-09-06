@@ -267,7 +267,7 @@ func create_door(room_instance: Node3D, door_position: Vector3, target_room_id: 
 	# Connect door signal
 	door_area.body_entered.connect(_on_door_entered.bind(target_room_id))
 
-func setup_room_content(room_instance: Node3D, room_data: Dictionary):
+func setup_room_content(_room_instance: Node3D, room_data: Dictionary):
 	var layout = get_room_layout(room_data.type, room_data.layout_id)
 	
 	# Add spawn points
@@ -276,23 +276,10 @@ func setup_room_content(room_instance: Node3D, room_data: Dictionary):
 	# Add reward points  
 	room_data.reward_points = layout.reward_points.duplicate()
 	
-	# Create visual markers for spawn points (debug)
-	for spawn_point in room_data.spawn_points:
-		create_spawn_marker(room_instance, spawn_point)
+	# Spawn points stored in room_data for enemy spawning
+	# No visual markers needed
 
-func create_spawn_marker(room_instance: Node3D, spawn_pos: Vector3):
-	var marker = MeshInstance3D.new()
-	marker.position = spawn_pos
-	
-	var sphere_mesh = SphereMesh.new()
-	sphere_mesh.radius = 0.3
-	marker.mesh = sphere_mesh
-	
-	var material = StandardMaterial3D.new()
-	material.albedo_color = Color.RED
-	marker.set_surface_override_material(0, material)
-	
-	room_instance.add_child(marker)
+# Spawn markers removed - no debug visuals needed
 
 func get_room_layout(room_type: RoomType, layout_id: int) -> Dictionary:
 	return room_layouts[room_type][layout_id % room_layouts[room_type].size()]
@@ -402,6 +389,10 @@ func transition_to_room(room_id: int):
 	room_entered.emit(current_room)
 	
 	print("Transitioned to room ", room_id, " - Type: ", get_room_type_name(current_room.type))
+	
+	# Trigger god encounter chance (like Hades)
+	if not old_room.is_empty() and room_id > 0:  # Don't trigger on first room
+		trigger_god_encounter_chance()
 
 func get_room_type_name(room_type: RoomType) -> String:
 	match room_type:
@@ -444,3 +435,53 @@ func get_room_info() -> Dictionary:
 		"completed_rooms": get_completed_rooms(),
 		"room_database": room_database
 	}
+
+# Reward system integration (Hades-like)
+func trigger_god_encounter_chance():
+	var reward_system = get_tree().get_first_node_in_group("reward_system")
+	if not reward_system:
+		print("RewardSystem not found")
+		return
+	
+	# Generate reward based on Hades mechanics
+	var reward = reward_system.generate_room_reward()
+	
+	if reward.type == reward_system.RewardType.BOON:
+		# Trigger boon encounter
+		trigger_boon_encounter()
+	else:
+		# Show other reward
+		trigger_other_reward(reward)
+
+func trigger_boon_encounter():
+	var boon_ui = get_tree().get_first_node_in_group("boon_selection_ui")
+	if not boon_ui:
+		# Find in scene tree
+		var ui_layer = get_tree().current_scene.get_node("UI")
+		if ui_layer and ui_layer.has_node("BoonSelectionUI"):
+			boon_ui = ui_layer.get_node("BoonSelectionUI")
+	
+	if boon_ui and boon_ui.has_method("trigger_god_encounter"):
+		var encounter_triggered = boon_ui.trigger_god_encounter()
+		if encounter_triggered:
+			print("God encounter triggered in room ", current_room.id)
+	else:
+		print("BoonSelectionUI not found for god encounter")
+
+func trigger_other_reward(reward_data: Dictionary):
+	var reward_ui = get_tree().get_first_node_in_group("reward_selection_ui")
+	if not reward_ui:
+		# Find in scene tree
+		var ui_layer = get_tree().current_scene.get_node("UI")
+		if ui_layer and ui_layer.has_node("RewardSelectionUI"):
+			reward_ui = ui_layer.get_node("RewardSelectionUI")
+	
+	if reward_ui and reward_ui.has_method("show_reward"):
+		reward_ui.show_reward(reward_data)
+		print("Other reward triggered: ", reward_data.name, " in room ", current_room.id)
+	else:
+		print("RewardSelectionUI not found - auto-applying reward: ", reward_data.name)
+		# Auto-apply if no UI
+		var reward_system = get_tree().get_first_node_in_group("reward_system")
+		if reward_system:
+			reward_system.apply_reward(reward_data)

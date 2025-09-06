@@ -4,6 +4,8 @@
 
 > **Objetivo Técnico:** Criar usando Godot 4.x + pipeline de IA automatizada. Claude Code fará 100% do desenvolvimento de código, você fornecerá assets via RTX 5070.
 
+> **Referência Principal:** [Hades Wiki](https://hades.fandom.com/wiki/Hades_Wiki) - Mecânicas oficiais do jogo original
+
 ## Stack Tecnológico
 
 ### Core Engine
@@ -388,11 +390,31 @@ python tools/generate_environment.py --theme "egyptian_tomb" --pieces 30
 - [ ] Minimap funcional
 - [ ] Save system básico
 
-## Sprint 7: Sistema de Boons (Semana 7)
+## Sprint 7: Sistema de Recompensas Completo (Semana 7)
+
+### Mecânicas do Hades a Implementar:
+**Tipos de Recompensas (além de Boons):**
+- 🏺 **Ankh Fragments** (Obols) - Moeda da run
+- ❤️ **Heart Pieces** (Centaur Hearts) - +25 HP permanente  
+- ⚡ **Power Fragments** (Pom of Power) - Upgrade boons existentes
+- 🔨 **Divine Hammer** (Daedalus Hammer) - Modificações de arma
+- 🧿 **Chaos Tokens** (Darkness/Gems) - Meta-progressão
+- 💀 **Soul Essence** (Nectar) - Para keepsakes
+
+**Sistema de Portas:**
+- Múltiplas portas com preview de recompensa
+- 25% chance boon, 75% outras recompensas
+- Símbolos visuais por tipo de recompensa
 
 ### Para Claude Code (Sessão 7)
 ```
-"Implemente sistema de boons como Hades:
+"Implemente sistema de recompensas completo como Hades:
+
+RewardSystem.gd:
+- 6 tipos de recompensas além de boons
+- Preview de recompensas nas portas
+- Probability system (25% boons, 75% outros)
+- Door selection UI
 
 BoonSystem.gd:
 - Data structure para boons (JSON/Resources)
@@ -1487,6 +1509,131 @@ Todos os assets gerados devem seguir:
 
 ---
 
+# HADES 1 COMPLETE ANALYSIS - MISSING SYSTEMS ⚠️
+
+## 🔥 SISTEMAS CRÍTICOS FALTANDO (baseado no [Hades Wiki](https://hades.fandom.com/wiki/Hades_Wiki))
+
+### **Meta-Progression Systems** (SPRINT 12-15)
+- ❌ **Mirror of Night** → **Pool of Memories** (20+ permanent upgrades)
+- ❌ **Contractor** → **Pyramid Builder** (House improvements)
+- ❌ **Keepsakes System** (25+ keepsakes from characters)
+- ❌ **Prophecies** → **Ancient Tablets** (achievement system)
+- ❌ **Heat System** → **Curse of Set** (difficulty scaling)
+
+### **Advanced Combat Systems** (SPRINT 8-11)
+- ❌ **Wall Slam damage** (knockback into walls)
+- ❌ **Armor system** (yellow health bars on elites)
+- ❌ **Backstab damage** (attacks from behind)
+- ❌ **Status Effects**: Weak, Charmed, Hangover, Chill, Doom
+- ❌ **Deflect mechanics** (projectile reflection)
+- ❌ **Privileged Status** (multiple debuffs bonus)
+
+### **Weapon Systems** (SPRINT 9-11)
+- ❌ **6 Infernal Arms** → **5 Egyptian Weapons** ✅ (parcial)
+- ❌ **4 Aspects per weapon** (24 total aspects)
+- ❌ **Hidden Aspects** (unlocked via prophecies)
+- ❌ **Titan Blood upgrades** → **Divine Essence**
+- ❌ **Daedalus Hammer** → **Divine Hammer** ✅ (implementado)
+
+### **Boon Systems Advanced** (SPRINT 11-12)
+- ❌ **Duo Boons** (combinations of 2 gods)
+- ❌ **Legendary Boons** (ultimate power boons)
+- ❌ **Chaos Boons** → **Set's Chaos** (curse then reward)
+- ❌ **Hermes Boons** → **Thoth's Speed** (utility boons)
+- ❌ **Boon Rarity upgrade** (Pom of Power system)
+
+### **Room & Encounter Systems** (SPRINT 6-8)
+- ❌ **Chamber Rewards Preview** (door symbols)
+- ❌ **Elite Encounters** (armored enemies)
+- ❌ **Mini-Boss Rooms**
+- ❌ **Chaos Gates** → **Set's Portals**
+- ❌ **Erebus Gates** → **Hidden Chambers**
+- ❌ **Shop System** → **Charon's Boat** → **Khnum's Forge**
+
+### **Currency & Resources** (SPRINT 7-12)
+- ✅ **Obols** → **Ankh Fragments** ✅
+- ❌ **Darkness** → **Chaos Tokens** ✅ (parcial)
+- ❌ **Chthonic Keys** → **Sacred Keys**
+- ❌ **Nectar** → **Soul Essence** ✅ (parcial)
+- ❌ **Ambrosia** → **Divine Ambrosia**
+- ❌ **Titan Blood** → **Divine Blood**
+- ❌ **Diamonds** → **Pharaoh Gems**
+
+### **House of Hades Systems** (SPRINT 12-16)
+- ❌ **House NPCs** → **Duat NPCs** (10+ characters)
+- ❌ **Relationship System** (gift giving, dialogue)
+- ❌ **House Upgrades** (cosmetic + functional)
+- ❌ **Training Room** → **Combat Arena**
+- ❌ **Music System** (Orpheus songs)
+- ❌ **Pet System** (Cerberus interactions)
+
+### **Advanced AI & Combat** (SPRINT 8-10)
+- ❌ **Elite Enemy Types** (armored variants)
+- ❌ **Mini-Bosses** (Asterius, Theseus style)
+- ❌ **Environmental Hazards** (traps, lava, spikes)
+- ❌ **Enemy Resurrection** (Elysium mechanic)
+- ❌ **Pack AI** (coordinated enemy attacks)
+
+### **Boss Systems** (SPRINT 10, 13-16)
+- ❌ **Multi-Phase Bosses** (4+ phases each)
+- ❌ **Boss Dialogue During Combat**
+- ❌ **Environmental Boss Mechanics**
+- ❌ **Boss Variant Rewards** (different rewards per boss)
+
+### **Quality of Life** (SPRINT 18-22)
+- ❌ **Pause Menu Stats** (run statistics)
+- ❌ **Damage Numbers Customization**
+- ❌ **Accessibility Options** (colorblind, controls)
+- ❌ **Multiple Save Slots** ✅ (implementado)
+- ❌ **Screenshot Mode**
+
+### **Polish & Juice** (SPRINT 20-24)
+- ❌ **Screen Shake System** ✅ (parcial)
+- ❌ **Particle Effects** (hit impacts, abilities)
+- ❌ **Sound Design** (spatial audio, dynamic music)
+- ❌ **Animation Polish** (attack canceling, combos)
+- ❌ **Visual Effects** (lighting, shadows, materials)
+
+## 📊 **IMPLEMENTAÇÃO ATUAL vs HADES COMPLETO**
+
+**✅ IMPLEMENTADO (15%):**
+- Basic combat system
+- Room generation
+- Basic boon system (20 boons)
+- Basic reward system (6 types)
+- Save system
+- Minimap
+
+**❌ FALTANDO (85%):**
+- **12 sistemas principais**
+- **200+ features individuais**
+- **Advanced AI & boss mechanics**
+- **Meta-progression completa**
+
+## 🎯 **PRIORIZAÇÃO SUGERIDA:**
+
+**SPRINT 8-12: CORE MISSING**
+- Weapon aspects
+- Status effects
+- Advanced combat
+- Meta-progression base
+
+**SPRINT 13-18: ADVANCED**
+- House systems
+- Relationship mechanics
+- Advanced boons
+- Elite encounters
+
+**SPRINT 19-24: POLISH**
+- Quality of life
+- Visual effects
+- Advanced AI
+- Performance optimization
+
+---
+
 # NARRATIVE DESIGN COMPLETE ✓
 
 O roadmap agora integra completamente a narrativa de **Sands of Duat** com todos os elementos técnicos. Khenti's journey através do Duat egípcio está mapeada em 24 sprints, com cada sistema de gameplay reforçando a história pessoal do príncipe assassinado lutando pela justiça. O jogo entregará 4 endings únicos baseados nas escolhas morais do player, com mitologia egípcia autêntica integrada em todos os aspectos do desenvolvimento.
+
+**⚠️ NOTA IMPORTANTE:** Implementação atual cobre apenas ~15% das mecânicas do Hades original. Para um clone completo e fiel, será necessário implementar os 85% de sistemas restantes mapeados acima.

@@ -143,3 +143,4 @@ func take_damage(damage: float):
 	if health_system:
 		health_system.take_damage(damage)
 		print("Player took ", damage, " damage")
+
