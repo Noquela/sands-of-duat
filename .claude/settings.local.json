@@ -25,7 +25,13 @@
       "Bash(godot:*)",
       "WebSearch",
       "WebFetch(domain:hades.fandom.com)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(python:*)",
+      "Bash(where godot)",
+      "Read(//c/**)",
+      "WebFetch(domain:www.gamedeveloper.com)",
+      "WebFetch(domain:hades.wiki.fextralife.com)",
+      "WebFetch(domain:www.thegamer.com)"
     ],
     "deny": [],
     "ask": []

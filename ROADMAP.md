@@ -6,6 +6,407 @@
 
 > **Referência Principal:** [Hades Wiki](https://hades.fandom.com/wiki/Hades_Wiki) - Mecânicas oficiais do jogo original
 
+---
+
+# 🎯 RESEARCH-BASED DEVELOPMENT GUIDELINES
+
+## **Hades ARPG Best Practices (2024 Research)**
+
+### **Level Design Principles** 
+*Based on Supergiant Games' official methodology*
+
+#### **Region-Specific Design Philosophy:**
+- **Cavernas dos Esquecidos** (Tartarus equivalent): Walled medium-sized rooms that feel claustrophobic and oppressive, emphasizing the trapped nature of lost souls
+- **Rio de Fogo** (Asphodel equivalent): Archipelago concept with disconnected platforms over lava flows, creating natural mobility challenges
+- **Salão do Julgamento** (Elysium equivalent): Grand architectural spaces that emphasize the divine nature of judgment, with clear sight lines and ceremonial layouts
+
+#### **Level Design Informing Enemy Design:**
+- **Mobility Differentiation**: Cavernas enemies are ground-based and slow, Rio de Fogo enemies can traverse lava/platforms, Salão enemies have divine flight/teleportation
+- **Environmental Integration**: Each biome's hazards should complement enemy types (lava geysers + fire enemies, judgment scales + truth-seeking enemies)
+- **Visual Narrative**: Room layouts should tell the story of each biome's purpose in Egyptian mythology
+
+#### **Solutions for Roguelike Exploration:**
+- **Breadcrumb Trail System**: Subtle visual cues showing player's path through the Duat
+- **Landmark-Based Navigation**: Distinctive Egyptian architectural elements (obelisks, statues) as reference points
+- **Progressive Revelation**: Each room reveals slightly more of the biome's story and layout
+
+### **Enemy AI Design Patterns**
+*From Game Developer industry analysis*
+
+#### **Enemy Archetype System:**
+- **Emphasizers**: Enemies that highlight existing player mechanics (dash-requiring enemies that emphasize mobility)
+- **Enforcers**: Enemies that enforce tactical thinking (shield enemies requiring specific attack patterns)
+- **Smashers**: High-damage enemies that create risk/reward moments
+- **Challengers**: Complex enemies that combine multiple mechanics
+
+#### **Attack Telegraph System:**
+- **Visual Tells**: Clear 0.5s warning before attacks with Egyptian-themed visual language (hieroglyph symbols, divine light)
+- **Audio Cues**: Distinct sound signatures per enemy type matching Egyptian instruments
+- **Timing Consistency**: 2-3 second attack intervals for predictable rhythm
+
+#### **Group AI Coordination:**
+- **Pack Tactics**: Jackal enemies coordinate flanking maneuvers
+- **Spellcaster Protection**: Ranged enemies position behind melee threats
+- **Elite Leadership**: Elite enemies buff nearby regular enemies
+
+### **Combat System Implementation**
+*Based on Hades' technical specifications*
+
+#### **Real-Time Combat Framework:**
+- **Split-Second Decision Making**: Combat timing that rewards quick analysis over button mashing
+- **Animation Priority System**: Attack animations can be cancelled by dash, maintaining fluidity
+- **Additive Damage System**: Percentage increases stack additively from base damage, not multiplicatively
+
+#### **Core Combat Loop:**
+- **Primary Attack**: Weapon-specific combo strings (3-hit for Khopesh, charged for Bow)
+- **Special Attack**: Area-of-effect or utility-focused abilities unique per weapon
+- **Dash Mechanics**: 6-unit distance with 0.3s invincibility frames, 2s cooldown
+- **Cast System**: Limited-use ranged attacks with Egyptian thematic (Ankh projectiles, divine light beams)
+
+#### **Difficulty Scaling Philosophy:**
+- **Player Prediction AI**: Enemies lead shots and predict dash directions
+- **Terrain Utilization**: Advanced AI uses walls, corners, and elevation for tactical advantage
+- **Progressive Challenge**: Each biome introduces one new combat concept while building on previous skills
+
+### **Progression System Design**
+*From Hades boon system analysis*
+
+#### **Boon System Architecture:**
+- **Randomized Progression**: No two runs have identical boon offerings, forcing adaptation
+- **Strategic Complexity**: Each god offers distinct gameplay modifications requiring different tactics
+- **Narrative Integration**: Boon collection drives character relationship development
+- **Temporary High-Impact**: Run-specific upgrades encourage experimentation without permanent consequences
+
+#### **Synergy System Design:**
+- **Tag-Based Compatibility**: Boons tagged with Egyptian concepts (Solar, Death, Wisdom, Protection) create natural combinations
+- **Multiplicative Interactions**: Certain combinations break normal additive rules for game-changing moments
+- **Visual Feedback**: Clear UI indicators when synergies are available or active
+
+#### **Meta-Progression Balance:**
+- **Mirror Equivalent** (Pool of Memories): 35,365 total Darkness equivalent for full completion
+- **Currency Diversification**: Multiple resource types prevent single-path optimization
+- **Unlock Gates**: Story progression gates prevent sequence breaking while maintaining player agency
+
+### **Procedural Generation Principles**
+*From 2024 roguelike design research*
+
+#### **Room-Based Generation Rules:**
+- **Accessibility First**: Every room must be reachable through valid hallway connections
+- **Challenge Variety**: Room types (Combat, Elite, Treasure, Boss) distributed according to established ratios
+- **Organic Shapes**: Departure from rectangular rooms to support artistic vision while maintaining functionality
+
+#### **Static vs Procedural Balance:**
+- **Static Elements**: Key story moments, boss arenas, tutorial areas for consistent quality
+- **Procedural Elements**: Combat encounters, reward distributions, minor environmental variations
+- **Hybrid Approach**: Handcrafted room templates with procedural decoration and enemy placement
+
+#### **Traditional Level Design Integration:**
+- **Critical Path**: Clear progression route through each biome with optional branches
+- **Risk vs Reward**: Elite encounters and secret areas offer higher rewards for increased challenge
+- **Pacing Control**: Mix of high-intensity combat and lower-intensity exploration/story moments
+
+---
+
+# 🔧 TECHNICAL IMPLEMENTATION SPECIFICATIONS
+
+## **Combat System Technical Requirements**
+
+### **Damage Calculation System:**
+```gdscript
+# Additive Damage Formula (Hades Method)
+final_damage = base_damage + (base_damage * sum_of_all_percentage_bonuses)
+
+# Example: 50 base damage + 20% boon + 15% weapon aspect + 10% meta upgrade
+# = 50 + (50 * 0.45) = 72.5 damage
+```
+
+### **Timing Windows (Frame-Perfect Implementation):**
+- **Perfect Parry Window**: 0.2 seconds (12 frames at 60fps)
+- **Dash I-frames**: 0.3 seconds (18 frames at 60fps)
+- **Attack Cancel Window**: 0.1 seconds after input (6 frames at 60fps)
+- **Telegraph Duration**: 0.5 seconds minimum for all enemy attacks
+
+### **Performance Specifications:**
+- **Max Simultaneous Enemies**: 8 active + 4 spawning
+- **Damage Number Pool Size**: 32 objects (recycled)
+- **Particle Effect Budget**: 100 active particles maximum
+- **Audio Voice Limit**: 32 simultaneous audio sources
+
+## **AI Behavior Implementation Patterns**
+
+### **State Machine Architecture:**
+```gdscript
+# BaseEnemy States
+enum EnemyState {
+    IDLE,           # Waiting/patrolling
+    DETECT,         # Player in range, acquiring target
+    CHASE,          # Moving toward player
+    ATTACK_WINDUP,  # Telegraph phase (0.5s)
+    ATTACK_ACTIVE,  # Damage dealing phase
+    ATTACK_RECOVERY,# Post-attack vulnerable window
+    STAGGER,        # Hit reaction
+    DEATH           # Death animation + cleanup
+}
+```
+
+### **Group Coordination System:**
+- **Shared AI Director**: Prevents all enemies from attacking simultaneously
+- **Attack Token System**: Maximum 2 enemies can attack player at once
+- **Formation Positioning**: Enemies maintain 3-unit minimum spacing
+- **Leader-Follower Patterns**: Elite enemies direct nearby regular enemies
+
+## **Progression System Technical Design**
+
+### **Boon Selection Algorithm:**
+```gdscript
+# Weighted Random Selection with Synergy Detection
+func select_boons() -> Array[BoonData]:
+    var available_boons = filter_by_prerequisites()
+    var weighted_pool = apply_rarity_weights()
+    var synergy_boosted = boost_synergy_boons(weighted_pool)
+    return select_three_unique(synergy_boosted)
+```
+
+### **Currency System Formulas:**
+- **Ankh Fragment Generation**: 15-25 per room (scaled by room difficulty)
+- **Divine Essence Drop Rate**: 2% base, +1% per Heat level
+- **Memory Fragment Conversion**: 100 Ankh Fragments = 1 Memory Fragment
+- **Upgrade Cost Progression**: cost = base_cost * (1.2 ^ upgrade_level)
+
+### **Meta-Progression Resource Requirements:**
+| Upgrade Tier | Memory Fragments | Total Cost | Equivalent Runs |
+|---------------|------------------|------------|-----------------|
+| Tier 1 (Core) | 50-100 | 500 | 5-10 runs |
+| Tier 2 (Advanced) | 150-300 | 1,500 | 15-30 runs |
+| Tier 3 (Master) | 500-1000 | 5,000 | 50-100 runs |
+| **Total Completion** | **3,000+** | **15,000+** | **150+ runs** |
+
+## **Level Generation Technical Specifications**
+
+### **Room Template System:**
+- **Template Pool**: 15 layouts per room type (Combat, Elite, Treasure, Boss)
+- **Spawn Point Rules**: 2-6 enemy spawn points per combat room
+- **Connection Requirements**: Minimum 2 exits per room, maximum 4
+- **Size Constraints**: 20x20 to 40x40 Godot units per room
+
+### **Procedural Decoration Parameters:**
+- **Egyptian Props Pool**: 50+ decorative elements (columns, hieroglyphs, statues)
+- **Lighting Variation**: 3-5 different lighting setups per biome
+- **Texture Rotation**: 4 wall texture variants per biome
+- **Ambient Audio**: 2-3 ambient loops per room type
+
+### **Performance Optimization Targets:**
+- **Loading Time**: <2 seconds between rooms
+- **Memory Usage**: <500MB per biome loaded
+- **Culling Distance**: Objects beyond 30 units disabled
+- **LOD System**: 3 detail levels based on distance from player
+
+---
+
+# 🔗 MAIN GAME LOOP INTEGRATION REQUIREMENTS
+
+## **GameManager.gd - Central Hub for All Systems**
+
+### **Critical Integration Points:**
+Every system MUST connect to GameManager.gd via signals and direct references to ensure nothing gets lost. The current MainGameScene.tscn structure shows the foundation, but each sprint must explicitly connect to this central hub.
+
+### **Signal Architecture (Required for All Systems):**
+```gdscript
+# COMBAT INTEGRATION
+signal player_attacked(damage: float, weapon_type: String)
+signal player_hit(damage: float, attacker: Node)
+signal enemy_killed(enemy: Node, player_caused: bool)
+signal combo_updated(hits: int, multiplier: float)
+
+# ROOM INTEGRATION  
+signal room_entered(room_type: String, room_data: Dictionary)
+signal room_cleared(completion_time: float, performance: Dictionary)
+signal door_selected(reward_type: String, door_data: Dictionary)
+
+# BOON INTEGRATION
+signal boon_offered(boon_options: Array[BoonData])
+signal boon_selected(boon: BoonData, choice_index: int)
+signal boon_applied(boon: BoonData, target: Node)
+
+# PROGRESSION INTEGRATION
+signal currency_gained(type: String, amount: int, source: String)
+signal upgrade_purchased(upgrade_id: String, cost: Dictionary)
+signal meta_progress_updated(category: String, progress: float)
+```
+
+### **System Connection Template (Every Sprint):**
+Each system implementation MUST include these connection steps:
+
+```gdscript
+# In GameManager.gd setup_connections()
+func connect_[SYSTEM_NAME]():
+    # Connect TO system (GameManager → System)
+    player_died.connect([system]._on_player_died)
+    wave_completed.connect([system]._on_wave_completed)
+    
+    # Connect FROM system (System → GameManager)  
+    [system].system_event.connect(_on_[system]_event)
+    [system].system_state_changed.connect(_on_[system]_state_changed)
+    
+    # Connect to UI updates
+    [system].ui_update_needed.connect(_update_ui_[system_name])
+    
+    print("✅ [SYSTEM_NAME] integrated with main game loop")
+```
+
+## **Mandatory Integration Checklist (Every Sprint)**
+
+### **🎯 Sprint Integration Requirements:**
+**Each sprint deliverable must pass this integration test:**
+
+1. **Scene Integration**: System node exists in MainGameScene.tscn
+2. **GameManager Connection**: System connected via setup_connections()
+3. **Signal Flow**: All events properly routed through GameManager
+4. **UI Updates**: System state changes reflect in UI immediately
+5. **Save Integration**: System state persists across game sessions
+6. **Performance Integration**: System respects global performance limits
+
+### **❌ Integration Failure Patterns (Must Avoid):**
+- Systems implemented in isolation without GameManager connection
+- UI elements that don't update when system state changes
+- Systems that work in test scenes but not in MainGameScene
+- Features accessible only through debug commands
+- Systems that don't persist state or connect to save system
+
+## **Sprint-by-Sprint Integration Specifications**
+
+### **Sprint 1-2: Foundation Integration**
+```
+DELIVERABLE: GameManager.gd with connection framework
+- Player reference: _player = get_node("Player")  
+- Camera connection: camera_controller.set_target(_player)
+- UI connection: health_bar.value = _player.health
+- Input routing: _input() → player._handle_input()
+INTEGRATION TEST: Player moves, camera follows, UI updates
+```
+
+### **Sprint 3: Combat Integration**
+```
+INTEGRATION REQUIREMENTS:
+# In GameManager.gd
+func setup_combat_integration():
+    # Connect player combat to manager
+    _player.get_node("CombatSystem").hit_dealt.connect(_on_player_hit_dealt)
+    _player.get_node("WeaponSystem").weapon_switched.connect(_on_weapon_switched)
+    
+    # Connect to UI
+    combo_updated.connect(_update_combo_ui)
+    
+    # Connect to camera effects
+    _player.get_node("CombatSystem").hit_impact.connect(camera_controller.add_shake)
+
+INTEGRATION TEST: Attack enemy → UI updates → Camera shakes → GameManager tracks stats
+```
+
+### **Sprint 4: Enemy Integration**
+```
+INTEGRATION REQUIREMENTS:
+# In GameManager.gd  
+func setup_enemy_integration():
+    # Connect spawner to manager
+    enemy_spawner.enemy_spawned.connect(_on_enemy_spawned)
+    enemy_spawner.wave_completed.connect(_on_wave_completed)
+    
+    # Connect individual enemies (via spawner)
+    func _on_enemy_spawned(enemy: Node):
+        enemy.died.connect(_on_enemy_died)
+        enemy.player_detected.connect(camera_controller.start_combat_mode)
+        
+INTEGRATION TEST: Enemy spawns → Appears in MainGameScene → Fights player → Death triggers wave completion
+```
+
+### **Sprint 5: Dash Integration**
+```
+INTEGRATION REQUIREMENTS:
+# In GameManager.gd
+func setup_dash_integration():
+    _player.get_node("DashSystem").dash_performed.connect(_on_player_dash)
+    _player.get_node("DashSystem").dash_cooldown_changed.connect(_update_dash_ui)
+    
+INTEGRATION TEST: Dash input → Player moves → UI cooldown → I-frames work in combat
+```
+
+### **Sprint 6: Room Integration**  
+```
+INTEGRATION REQUIREMENTS:
+# In GameManager.gd
+func setup_room_integration():
+    room_system.room_generated.connect(_on_room_generated)
+    room_system.door_selected.connect(_on_door_selected)
+    
+    # Connect room to other systems
+    func _on_room_generated(room_data):
+        enemy_spawner.setup_room(room_data)
+        camera_controller.set_arena_bounds(room_data.bounds)
+        
+INTEGRATION TEST: Enter door → Room generates → Enemies spawn → UI updates → Camera bounds set
+```
+
+### **Sprint 7: Boon Integration**
+```
+INTEGRATION REQUIREMENTS:
+# In GameManager.gd
+func setup_boon_integration():
+    boon_system.boon_selected.connect(_on_boon_selected)
+    reward_system.boon_room_entered.connect(_show_boon_selection)
+    
+    func _on_boon_selected(boon: BoonData):
+        _player.apply_boon(boon)  # Apply to player stats
+        weapon_system.apply_boon(boon)  # Apply to weapon if applicable
+        ui_hud.update_boon_display()  # Update UI
+        
+INTEGRATION TEST: Enter boon room → UI shows selection → Pick boon → Stats update → Effect visible in combat
+```
+
+### **Integration Testing Protocol (Every Sprint)**
+
+#### **Mandatory Tests:**
+1. **Scene Load Test**: MainGameScene loads without errors
+2. **System Active Test**: New system responds to player actions
+3. **UI Update Test**: System changes reflect in UI within 1 frame
+4. **Signal Chain Test**: Events properly propagate through GameManager
+5. **Performance Test**: 60fps maintained with system active
+6. **Save Load Test**: System state persists across sessions
+
+#### **Integration Failure = Sprint Incomplete**
+```
+❌ System works in test scene but not MainGameScene
+❌ System exists but doesn't respond to player input
+❌ UI elements exist but don't update with system state  
+❌ System bypasses GameManager architecture
+❌ Features only accessible via debug/cheat codes
+❌ System causes performance drops in MainGameScene
+```
+
+### **GameManager.gd Required Methods (Template)**
+```gdscript
+# Every sprint must add methods like these:
+
+func _on_[system]_event(data):
+    """Handle events from [system]"""
+    # Update other systems
+    # Update UI  
+    # Track statistics
+    # Trigger related effects
+
+func _update_ui_[system]():
+    """Update UI elements for [system]"""
+    # Ensure UI reflects current system state
+    
+func _save_[system]_state() -> Dictionary:
+    """Save [system] state for persistence"""
+    return [system].get_save_data()
+    
+func _load_[system]_state(data: Dictionary):
+    """Load [system] state from save data"""
+    [system].load_save_data(data)
+```
+
 ## Stack Tecnológico
 
 ### Core Engine
@@ -297,26 +698,31 @@ python tools/generate_player.py --name "khenti" --style "egyptian_prince_warrior
 
 ### Para Claude Code (Sessão 3)
 ```
-"Implemente sistema de combate básico:
+"Implemente sistema de combate básico seguindo especificações técnicas do ROADMAP:
 
-CombatSystem.gd:
-- Ataques com botão esquerdo mouse
-- Hit detection com raycast 3D
-- Damage numbers flutuantes
-- Hitstop de 0.1s quando acerta
-- Combo de 3 ataques básicos
+CombatSystem.gd - TIMING REQUIREMENTS:
+- Attack timing: Primary attacks cancelável em 0.1s (6 frames)
+- Hit detection: Raycast 3D com área variável por arma
+- Hitstop: 0.08s para hits normais, 0.15s para critical hits
+- Combo timing: 3-hit strings com 0.3s windows entre hits
+- Damage formula: Additive system (base + base * sum_of_bonuses)
 
-WeaponSystem.gd:
-- Sistema de armas switchable
-- Stats por arma (damage, range, speed)
-- Animações diferentes por arma
+WeaponSystem.gd - EGYPTIAN WEAPONS:
+- Was Scepter: Fast attacks, 40 base damage, 1.5 attack speed
+- Khopesh: Balanced, 60 base damage, 1.0 attack speed, 3-hit combo
+- Combat responsiveness: <50ms input lag target
 
-HealthSystem.gd:
-- Sistema de vida para todos os caracteres
-- Morte com animação
-- Regeneração de vida
+HealthSystem.gd - PERFORMANCE:
+- Health bars: Smooth animation, 32 damage number pool
+- Death system: 2-second death animation, cleanup after 1s
+- Regeneration: Optional, based on boons only
 
-Target: Combate responsivo como Hades, com feedback tátil forte."
+IMPLEMENTATION TARGETS:
+- 60fps durante combate com 8 inimigos
+- Damage numbers pool reciclado para performance
+- Attack canceling: Dash pode cancelar qualquer ataque
+
+Target: Combat timing que recompensa decisões rápidas sobre button mashing"
 ```
 
 ### Para Você (Assets)
@@ -334,37 +740,46 @@ python tools/generate_vfx.py --effects "hit_impact,damage_numbers,death_explosio
 - [ ] Hit detection 100% confiável
 - [ ] Feedback visual/audio implementado
 - [ ] Sistema de vida robusto
+- [ ] **INTEGRATION: CombatSystem conectado no GameManager**
+- [ ] **INTEGRATION: UI de combate atualiza em tempo real**
+- [ ] **INTEGRATION: Camera shake funciona durante combate**
+- [ ] **INTEGRATION: Player combat stats tracked pelo GameManager**
 
 ## Sprint 4: Inimigos Básicos + IA (Semana 4)
 
 ### Para Claude Code (Sessão 4)
 ```
-"Crie sistema de inimigos com IA:
+"Implemente sistema de inimigos seguindo padrões de design pesquisados:
 
-BaseEnemy.gd:
-- CharacterBody3D base para todos inimigos
-- Estados: Idle, Chase, Attack, Stagger, Death
-- Pathfinding 3D com NavigationAgent3D
-- Sistema de vida integrado
+BaseEnemy.gd - STATE MACHINE (do ROADMAP):
+- Estados: IDLE → DETECT → CHASE → ATTACK_WINDUP → ATTACK_ACTIVE → ATTACK_RECOVERY
+- ATTACK_WINDUP: 0.5s telegraph mínimo (hieroglyph visual cues)
+- STAGGER: Hit reaction, 0.2s vulnerable window
+- DEATH: 2s animation, spawn rewards após 1s
 
-EnemyTypes (Egípcios):
-1. Shade of the Lost (melee, 100hp, speed 3.0) - Almas perdidas no Duat
-2. Mummy Archer (ranged, 80hp, speed 2.0) - Guardas antigos do submundo  
-3. Sand Djinn (magic, 120hp, speed 4.0) - Espíritos do deserto
+ENEMY ARCHETYPES (Game Developer Patterns):
+1. Shade of the Lost (EMPHASIZER): Força uso de dash, 100hp, speed 3.0
+   - Behavior: Slow lunging attacks que exigem dash timing
+2. Mummy Archer (ENFORCER): Força pensamento tático, 80hp, speed 2.0  
+   - Behavior: Positions behind cover, lead shots baseados em player velocity
+3. Sand Djinn (CHALLENGER): Complex mechanics, 120hp, speed 4.0
+   - Behavior: Teleportation + AOE magic, combines positioning + timing
 
-AI Behaviors:
-- Detecta player em radius 8.0
-- Segue player com pathfinding
-- Ataca quando em range
-- Telegraph ataques (0.5s warning)
-- Knockback quando morrer
+AI COORDINATION SYSTEM:
+- Attack Token System: Max 2 enemies attacking simultaneously
+- Formation spacing: 3-unit minimum between enemies
+- Leader-follower: Elite enemies buff nearby regulars
+- Terrain utilization: Use walls/corners for tactical advantage
 
-EnemySpawner.gd:
-- Spawna inimigos em waves
-- Máximo 8 inimigos simultâneos
-- Balance progressivo
+EnemySpawner.gd - PERFORMANCE SPECS:
+- Max active: 8 enemies + 4 spawning queue
+- Spawn balancing: Match room difficulty rating
+- AI Director: Prevents attack spam, maintains challenge curve
 
-Performance: 60fps com 8+ inimigos ativos"
+TECHNICAL TARGETS:
+- 60fps com 8 inimigos ativos + pathfinding
+- Telegraph clarity: 90%+ player recognition rate
+- Attack prediction: Lead player movement by 0.3s"
 ```
 
 ### Para Você (Assets)
@@ -379,6 +794,10 @@ python tools/generate_enemies.py --count 10 --theme "egyptian_underworld"
 - [ ] IA que sente desafiadora mas justa
 - [ ] Pathfinding funciona sem travamentos
 - [ ] Sistema de spawning balanceado
+- [ ] **INTEGRATION: EnemySpawner conectado no GameManager**
+- [ ] **INTEGRATION: Inimigos mortos triggerem wave_completed**  
+- [ ] **INTEGRATION: Enemy detection triggera combat camera mode**
+- [ ] **INTEGRATION: Enemy stats tracked para balancing**
 
 ---
 
@@ -416,6 +835,10 @@ Target: Combate tático como Hades, com timing importante."
 - [ ] 3 habilidades especiais únicas
 - [ ] Sistema de cooldowns funcional
 - [ ] Combo system satisfatório
+- [ ] **INTEGRATION: DashSystem conectado no GameManager**
+- [ ] **INTEGRATION: Dash UI cooldown updates em tempo real**
+- [ ] **INTEGRATION: I-frames funcionam contra todos os inimigos**
+- [ ] **INTEGRATION: Dash pode cancelar attacks em combate**
 
 ## Sprint 6: Sistema de Salas (Semana 6)
 
@@ -456,71 +879,76 @@ python tools/generate_environment.py --theme "egyptian_tomb" --pieces 30
 - [ ] Transições suaves entre áreas
 - [ ] Minimap funcional
 - [ ] Save system básico
+- [ ] **INTEGRATION: RoomSystem conectado no GameManager**
+- [ ] **INTEGRATION: Room transitions carregam no MainGameScene**
+- [ ] **INTEGRATION: Minimap updates com room progression**
+- [ ] **INTEGRATION: Save system preserva room state e player position**
 
 ## Sprint 7: Sistema de Recompensas Completo (Semana 7)
 
 ### Mecânicas do Hades a Implementar:
-**Tipos de Recompensas (além de Boons):**
-- 🏺 **Ankh Fragments** (Obols) - Moeda da run
-- ❤️ **Heart Pieces** (Centaur Hearts) - +25 HP permanente  
-- ⚡ **Power Fragments** (Pom of Power) - Upgrade boons existentes
-- 🔨 **Divine Hammer** (Daedalus Hammer) - Modificações de arma
-- 🧿 **Chaos Tokens** (Darkness/Gems) - Meta-progressão
-- 💀 **Soul Essence** (Nectar) - Para keepsakes
+**Tipos de Recompensas (Research-Based Implementation):**
+- 🏺 **Ankh Fragments** (Obols) - 15-25 per room, scaled by difficulty
+- ❤️ **Heart Pieces** (Centaur Hearts) - +25 HP permanente, rare drops  
+- ⚡ **Power Fragments** (Pom of Power) - Upgrade existing boons +1 level
+- 🔨 **Divine Hammer** (Daedalus Hammer) - Weapon modification boons
+- 🧿 **Chaos Tokens** (Darkness/Gems) - Meta-progression currency  
+- 💀 **Soul Essence** (Nectar) - Keepsake sistema, relationship building
 
-**Sistema de Portas:**
-- Múltiplas portas com preview de recompensa
-- 25% chance boon, 75% outras recompensas
-- Símbolos visuais por tipo de recompensa
+**Sistema de Portas (Hades Analysis):**
+- Preview system: Clear visual symbols per reward type
+- Probability: 25% boon rooms, 30% ankh fragments, 20% heart pieces, 25% other
+- Choice tension: Multiple doors force risk/reward decisions
 
 ### Para Claude Code (Sessão 7)
 ```
-"Implemente sistema de recompensas completo como Hades:
+"Implemente sistema de recompensas seguindo análise detalhada do Hades:
 
-RewardSystem.gd:
-- 6 tipos de recompensas além de boons
-- Preview de recompensas nas portas
-- Probability system (25% boons, 75% outros)
-- Door selection UI
+RewardSystem.gd - HADES SPECIFICATIONS:
+- Door preview: Símbolos egípcios por reward type
+- Probability weights: Balanced distribution preventing boon floods
+- Room reward pools: Permanent (blue laurel) vs Temporary (golden laurel)
+- Preview accuracy: 100% - no fake-outs or surprises
 
-BoonSystem.gd:
-- Data structure para boons (JSON/Resources)
-- Sistema de raridades (Common/Rare/Epic/Legendary)
-- Boon selection UI (3 opções)
-- Sistema de stacking
+BoonSystem.gd - REPLAYABILITY CORE:
+- Selection UI: 3 boons maximum, clear rarity visual hierarchy
+- Rarity distribution: Common 70%, Rare 25%, Epic 4%, Legendary 1%  
+- Synergy system: Tag-based (Solar, Death, Wisdom, Protection)
+- Additive stacking: boon_power = base_power + (base_power * bonuses)
 
-20 Boons Iniciais Temáticos:
+EGYPTIAN BOON DESIGN - NARRATIVE INTEGRATION:
 
-**Bênçãos de Ra** (Fire/Light):
-- Chama Dourada: +10/20/30% fire damage
-- Luz Solar: Ataques cegam inimigos
-- Eclipse: AOE burst quando low HP
+**Bênçãos de Ra** (Solar/Fire Domain):
+- Chama Dourada: +15/25/35% fire damage (scales with rarity)
+- Luz Purificadora: Attacks blind enemies for 2s
+- Eclipse Solar: AOE burst at 25% HP, massive damage
 
-**Proteção de Bastet** (Defense/Speed):  
-- Reflexos Felinos: +15/25/40% dodge chance
-- Salto da Gata: +20/40/60 dash distance
-- Garras Afiadas: Counter-attack damage
+**Proteção de Bastet** (Defense/Agility):
+- Reflexos Felinos: +20/35/50% dodge chance  
+- Salto da Gata: Dash distance +30/50/70%
+- Caça Noturna: Movement speed +25% in dark areas
 
 **Sabedoria de Thoth** (Magic/Utility):
-- Língua Antiga: +5/10/15% boon rarity  
-- Escrita Sagrada: Spell cooldown -20/30/40%
-- Olho Místico: Reveal hidden content
+- Escrita Sagrada: Ability cooldowns -25/35/50%
+- Olho Místico: Reveal secret rooms/items
+- Palavra de Poder: Spells pierce through enemies
 
-**Julgamento de Anubis** (Death/Reaper):
-- Pesagem do Coração: Execute <25% HP enemies
-- Balança da Verdade: +damage baseado em enemy "guilt"
-- Guia dos Mortos: Heal quando enemy dies
+**Julgamento de Anubis** (Death/Justice):
+- Pesagem do Coração: Execute enemies below 30/35/40% HP
+- Balança da Verdade: Damage scales with enemy "corruption level"
+- Guia dos Mortos: Heal 15/25/35 HP when enemy dies
 
-BoonRNG.gd:
-- Weighted random selection
-- Prevent duplicate offerings
-- Synergy detection
-- Quality scaling with run progress
+TECHNICAL IMPLEMENTATION:
+- BoonSelection algorithm: Weighted random with synergy boost
+- Anti-frustration: Prevent 3+ consecutive non-boon rooms
+- Performance: Boon calculations cached, not computed per frame
+- UI responsiveness: Selection confirm in <0.1s
 
-UI:
-- Tooltip system detalhado
-- Preview de stats
-- Visual feedback de raridade"
+REPLAYABILITY TARGETS:
+- 50+ unique boons by Sprint 11
+- Duo boons: 15+ combinations between gods
+- Legendary conditions: Require specific prerequisite boons
+- Run variation: No identical boon sets across 100+ runs"
 ```
 
 ### Deliverables Sprint 7
@@ -528,6 +956,10 @@ UI:
 - [ ] UI de seleção polida
 - [ ] Sistema de raridades balanceado
 - [ ] Synergias básicas implementadas
+- [ ] **INTEGRATION: BoonSystem conectado no GameManager**
+- [ ] **INTEGRATION: Boon selection UI aparece em boon rooms**
+- [ ] **INTEGRATION: Boons aplicados afetam player stats em tempo real**
+- [ ] **INTEGRATION: Boon effects visíveis em combate imediatamente**
 
 ## Sprint 8: Enemy Expansion (Semana 8)
 
@@ -1007,7 +1439,7 @@ Quality assurance:
 
 # Templates para Claude Code
 
-## Template de Sessão Efetiva
+## Template de Sessão com Integração Obrigatória
 
 ```
 CONTEXTO: Estou criando um Hades clone em Godot 4.x. Você já implementou [sistemas existentes]. Agora preciso de [nova funcionalidade].
@@ -1021,17 +1453,46 @@ ESPECIFICAÇÕES TÉCNICAS:
 REQUISITOS ESPECÍFICOS:
 [Lista detalhada do que deve ser implementado]
 
+🔗 INTEGRAÇÃO OBRIGATÓRIA:
+- Sistema DEVE conectar ao GameManager.gd via signals
+- Sistema DEVE aparecer funcionando no MainGameScene.tscn  
+- Sistema DEVE atualizar UI em tempo real
+- Sistema DEVE persistir state no save system
+- Sistema DEVE respeitar performance limits globais
+
+CONEXÕES REQUERIDAS:
+- GameManager signals: [listar signals específicos]
+- UI elements: [listar elementos UI que devem atualizar]
+- Other systems: [listar sistemas que devem interagir]
+
 RESTRIÇÕES:
 - Manter código modular e bem comentado
 - Performance não pode degradar
 - Compatível com sistemas existentes
 - Seguir padrões de código estabelecidos
+- NUNCA implementar em isolação - sempre integrar
 
 DELIVERABLES:
 [Lista específica do que deve funcionar no final]
++ INTEGRATION DELIVERABLES:
+- [ ] Sistema node exists in MainGameScene.tscn
+- [ ] GameManager.setup_[system]_connections() implemented
+- [ ] All signals properly connected
+- [ ] UI updates when system state changes
+- [ ] System works in MainGameScene, not just test scenes
 
-TESTING:
-Como testar se está funcionando corretamente
+INTEGRATION TESTING:
+1. Load MainGameScene - sistema deve estar ativo
+2. Player action → System response → UI update (1 frame)  
+3. System state change → GameManager notification
+4. Save/Load → System state persists correctly
+5. Performance: 60fps maintained with system active
+
+FAILURE CONDITIONS (Sprint incomplete if any):
+❌ System works in test scene but not MainGameScene
+❌ UI doesn't update when system state changes
+❌ System bypasses GameManager architecture  
+❌ Features only accessible via debug/cheats
 ```
 
 ## Script de Automação Completa
