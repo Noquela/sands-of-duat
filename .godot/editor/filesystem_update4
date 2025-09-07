@@ -5,3 +5,5 @@ res://scripts/core/Player3D.gd
 res://scripts/core/GameController.gd
 res://scripts/camera/IsometricCameraFollow.gd
 res://scripts/combat/CombatSystem.gd
+res://scripts/effects/AttackSwipe.gd
+res://scripts/enemies/BaseEnemy.gd

@@ -98,7 +98,7 @@ func _update_ai_state(delta):
 		EnemyState.ATTACKING:
 			_state_attacking(delta)
 
-func _state_idle(delta):
+func _state_idle(_delta):
 	velocity.x = 0
 	velocity.z = 0
 	
@@ -147,7 +147,7 @@ func _state_chasing(delta):
 		target_player = null
 		_change_state(EnemyState.PATROLLING)
 
-func _state_attacking(delta):
+func _state_attacking(_delta):
 	# Stop movement during attack
 	velocity.x = 0
 	velocity.z = 0
