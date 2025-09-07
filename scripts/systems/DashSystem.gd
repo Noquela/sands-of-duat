@@ -32,6 +32,7 @@ var dash_direction: Vector3 = Vector3.ZERO
 var dash_start_position: Vector3 = Vector3.ZERO
 var dash_target_position: Vector3 = Vector3.ZERO
 var cooldown_timer: float = 0.0
+var current_afterimage_effect: AfterimageEffect = null
 
 # References
 var player: CharacterBody3D
@@ -51,6 +52,11 @@ func _process(delta):
 	# Handle dash duration
 	if is_dashing:
 		dash_timer += delta
+		
+		# Update afterimage trail during dash
+		if current_afterimage_effect and player:
+			current_afterimage_effect.update_trail(player)
+		
 		if dash_timer >= DASH_DURATION:
 			_end_dash()
 	
@@ -124,6 +130,11 @@ func _end_dash():
 	dash_timer = 0.0
 	dash_direction = Vector3.ZERO
 	
+	# Stop afterimage effect
+	if current_afterimage_effect:
+		current_afterimage_effect.stop_trail()
+		current_afterimage_effect = null
+	
 	print("🏃 Dash completed")
 	dash_ended.emit()
 
@@ -196,14 +207,17 @@ func _point_to_line_distance(point: Vector3, line_start: Vector3, line_end: Vect
 	return point.distance_to(projection)
 
 func _create_dash_effect():
-	# Create visual dash effect
-	var effect_scene = preload("res://scenes/effects/DashTrail.tscn")
-	if effect_scene:
-		var effect = effect_scene.instantiate()
-		get_tree().current_scene.add_child(effect)
-		effect.global_position = player.global_position
-		effect.setup_trail(dash_start_position, dash_target_position, DASH_DURATION)
-		print("💨 Dash trail effect created")
+	# Create professional afterimage effect for dash
+	var afterimage_effect = AfterimageEffect.new()
+	get_tree().current_scene.add_child(afterimage_effect)
+	
+	# Start the trail
+	afterimage_effect.start_trail(player)
+	
+	# Store reference to update during dash
+	current_afterimage_effect = afterimage_effect
+	
+	print("👻 Professional afterimage effect started")
 
 # Stamina management
 func get_stamina() -> float:

@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://bq7j4n8m5qk2y"]
+
+[ext_resource type="Script" path="res://scripts/effects/SlashEffect.gd" id="1_slash_script"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_slash_particle"]
+transparency = 1
+albedo_color = Color(1, 0.8, 0.2, 0.9)
+emission_enabled = true
+emission = Color(1, 0.6, 0.1, 1)
+emission_energy = 3.0
+billboard_mode = 1
+
+[node name="SlashEffect" type="GPUParticles3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_slash_particle")
+emitting = false
+amount = 100
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+script = ExtResource("1_slash_script")

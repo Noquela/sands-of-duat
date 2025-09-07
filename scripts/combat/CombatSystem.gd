@@ -122,22 +122,22 @@ func _calculate_damage(attacker: Node3D, target: Node3D) -> int:
 	return final_damage
 
 func _create_attack_effect(_attack_position: Vector3, direction: Vector3):
-	# Create visual attack effect that extends from player toward attack direction
-	var effect_scene = preload("res://scenes/effects/AttackSwipe.tscn")
-	if effect_scene:
-		var effect = effect_scene.instantiate()
-		get_tree().current_scene.add_child(effect)
+	# Create professional slash effect using GPUParticles3D
+	var slash_scene = preload("res://scenes/effects/SlashEffect.tscn")
+	if slash_scene:
+		var slash_effect = slash_scene.instantiate()
+		get_tree().current_scene.add_child(slash_effect)
 		
-		# Find player position to start the attack from
+		# Find player position to start the slash from
 		var player = get_tree().get_first_node_in_group("player")
 		if player:
-			var player_pos = player.global_position
+			var player_pos = player.global_position + Vector3(0, 1, 0)  # Slightly above player
 			
-			# Setup attack effect from player toward direction with proper length
-			if effect.has_method("setup_attack_line"):
-				effect.setup_attack_line(player_pos, direction, ATTACK_RANGE)
+			# Create professional slash arc effect
+			if slash_effect.has_method("create_slash_at"):
+				slash_effect.create_slash_at(player_pos, direction, ATTACK_RANGE / 2.0)
 			
-			print("✨ Attack effect: from " + str(player_pos) + " toward " + str(direction))
+			print("⚔️ Professional slash effect created")
 
 func _create_hit_effect(target: Node3D):
 	# Create hit flash effect on enemy

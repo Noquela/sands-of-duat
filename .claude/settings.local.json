@@ -32,7 +32,9 @@
       "WebFetch(domain:www.gamedeveloper.com)",
       "WebFetch(domain:hades.wiki.fextralife.com)",
       "WebFetch(domain:www.thegamer.com)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "WebFetch(domain:godotforums.org)",
+      "WebFetch(domain:docs.godotengine.org)"
     ],
     "deny": [],
     "ask": []
