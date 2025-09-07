@@ -1,9 +1,12 @@
 # Player3D.gd
 # 3D Isometric Player Controller for Sands of Duat
 # Khenti - Egyptian Prince Protagonist
-# Sprint 2: Player Controller Base
+# Sprint 5: Player Controller + Special Abilities
 
 extends CharacterBody3D
+
+# Preload ability system class
+const AbilitySystem = preload("res://scripts/systems/AbilitySystem.gd")
 
 # Movement specs from roadmap
 const SPEED = 5.0
@@ -21,8 +24,14 @@ var movement_vector: Vector3
 # System references
 var combat_system: Node
 var dash_system: Node
+var ability_system: AbilitySystem
 var is_invulnerable: bool = false
 var invulnerability_timer: float = 0.0
+
+# Shield system (for Divine Shield ability)
+var shield_active: bool = false
+var shield_damage_reduction: float = 0.0
+var shield_duration: float = 0.0
 
 func _ready():
 	print("⚔️ Khenti awakens in the Duat...")
@@ -41,6 +50,12 @@ func _ready():
 		print("⚠️ Dash system not found!")
 	else:
 		print("🏃 Dash system connected")
+	
+	# Setup ability system
+	ability_system = AbilitySystem.new()
+	add_child(ability_system)
+	ability_system.name = "AbilitySystem"
+	print("⚡ Ability system initialized")
 	
 	# Setup health system
 	if health_system:
@@ -115,6 +130,14 @@ func _handle_input():
 	# Handle dash input
 	if Input.is_action_just_pressed("dash"):
 		_perform_dash()
+	
+	# Handle special ability inputs (Sprint 5)
+	if Input.is_action_just_pressed("ability_1"):
+		_use_ability("area_slam")
+	if Input.is_action_just_pressed("ability_2"):
+		_use_ability("divine_projectile")
+	if Input.is_action_just_pressed("ability_3"):
+		_use_ability("divine_shield")
 
 func _apply_movement(_delta):
 	# Convert 2D input to 3D isometric movement
@@ -187,6 +210,37 @@ func _perform_dash():
 		if success:
 			print("🏃 Khenti dashes!")
 
+func _use_ability(ability_name: String):
+	"""Use special ability (Sprint 5)"""
+	if not ability_system:
+		print("⚠️ No ability system available")
+		return
+	
+	var success = ability_system.use_ability(ability_name, self)
+	if success:
+		print("⚡ Khenti uses %s!" % ability_name)
+	else:
+		print("❌ Cannot use %s (cooldown or energy)" % ability_name)
+
+func apply_shield(damage_reduction: float, duration: float):
+	"""Apply divine shield effect"""
+	shield_active = true
+	shield_damage_reduction = damage_reduction
+	shield_duration = duration
+	
+	print("🛡️ Divine shield activated! %.0f%% damage reduction for %.1fs" % [damage_reduction * 100, duration])
+	
+	# Start shield duration timer
+	var shield_timer = get_tree().create_timer(duration)
+	shield_timer.timeout.connect(_remove_shield)
+
+func _remove_shield():
+	"""Remove divine shield effect when it expires"""
+	shield_active = false
+	shield_damage_reduction = 0.0
+	shield_duration = 0.0
+	print("🛡️ Divine shield expired")
+
 # Combat methods for integration with systems
 func take_damage(amount: int, damage_type: String = "physical"):
 	# Check invulnerability (from dash or damage immunity)
@@ -194,10 +248,18 @@ func take_damage(amount: int, damage_type: String = "physical"):
 		print("🛡️ Khenti is invulnerable - damage blocked!")
 		return
 	
+	var final_damage = amount
+	
+	# Apply shield reduction (Sprint 5: Divine Shield)
+	if shield_active:
+		final_damage = int(amount * (1.0 - shield_damage_reduction))
+		var blocked_damage = amount - final_damage
+		print("🛡️ Divine shield blocks %d damage! (%d → %d)" % [blocked_damage, amount, final_damage])
+	
 	if health_system and health_system.has_method("take_damage"):
-		health_system.take_damage(amount, damage_type)
+		health_system.take_damage(final_damage, damage_type)
 	else:
-		print("💔 Player took %d %s damage (no health system)" % [amount, damage_type])
+		print("💔 Player took %d %s damage (no health system)" % [final_damage, damage_type])
 
 func set_invulnerable(duration: float):
 	is_invulnerable = true

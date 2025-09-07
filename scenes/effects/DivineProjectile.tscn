@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://cpqf8xvpx4aer"]
+
+[ext_resource type="Script" path="res://scripts/combat/Projectile.gd" id="1_0hdxk"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.1
+height = 0.5
+
+[node name="DivineProjectile" type="RigidBody3D"]
+collision_layer = 8
+collision_mask = 4
+gravity_scale = 0.0
+script = ExtResource("1_0hdxk")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_1")
