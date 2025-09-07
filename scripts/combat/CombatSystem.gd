@@ -66,6 +66,9 @@ func perform_attack(attacker: Node3D, attack_position: Vector3, attack_direction
 			target.take_damage(damage, "physical")
 			damage_dealt.emit(target, damage, "physical")
 			
+			# Create hit flash effect on enemy
+			_create_hit_effect(target)
+			
 			# Check if enemy defeated
 			if target.has_method("get_health") and target.get_health() <= 0:
 				enemy_defeated.emit(target)
@@ -127,6 +130,20 @@ func _create_attack_effect(position: Vector3, direction: Vector3):
 		effect.global_position = position
 		effect.look_at(position + direction, Vector3.UP)
 		print("✨ Attack effect created at: " + str(position))
+
+func _create_hit_effect(target: Node3D):
+	# Create hit flash effect on enemy
+	var hit_flash_script = preload("res://scripts/effects/HitFlash.gd")
+	if hit_flash_script and target:
+		var hit_effect = Node3D.new()
+		hit_effect.set_script(hit_flash_script)
+		get_tree().current_scene.add_child(hit_effect)
+		
+		# Find enemy mesh
+		var enemy_mesh = target.get_node_or_null("MeshInstance3D")
+		if enemy_mesh:
+			hit_effect.setup(enemy_mesh)
+			print("💥 Hit effect created on: " + target.name)
 
 # Damage dealing to player
 func deal_damage_to_player(player: Node3D, damage: int, damage_type: String = "physical"):

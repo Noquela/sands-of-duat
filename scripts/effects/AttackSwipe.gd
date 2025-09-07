@@ -18,17 +18,34 @@ func _animate_swipe():
 	if not mesh_instance:
 		return
 	
-	# Scale animation - simple approach
+	# Enhanced animation - more visible and dramatic
 	var tween = create_tween()
+	tween.set_parallel(true)
 	
-	# Start small and grow
-	scale = Vector3(0.1, 0.1, 0.1)
-	tween.tween_property(self, "scale", Vector3(1.2, 1.2, 1.2), 0.2)
+	# Start small and grow bigger
+	scale = Vector3(0.2, 0.2, 0.2)
+	tween.tween_property(self, "scale", Vector3(2.5, 2.5, 2.5), 0.15)
 	
-	# Fade out material if available
+	# Rotate for dynamic effect
+	var initial_rotation = rotation_degrees
+	tween.tween_property(self, "rotation_degrees", initial_rotation + Vector3(0, 0, 180), 0.15)
+	
+	# Fade out after growth
+	tween.tween_delay(0.1)
+	tween.tween_property(self, "scale", Vector3(3.0, 3.0, 3.0), 0.2)
+	
+	# Create material glow effect
 	var material = mesh_instance.get_surface_override_material(0)
-	if material:
-		tween.tween_property(material, "albedo_color:a", 0.0, 0.1)
+	if not material:
+		material = StandardMaterial3D.new()
+		material.albedo_color = Color(1, 0.8, 0.2, 0.8)  # Golden color
+		material.emission_enabled = true
+		material.emission = Color(1, 0.6, 0.1, 1)  # Bright glow
+		mesh_instance.set_surface_override_material(0, material)
+	
+	# Fade out the glow
+	tween.tween_delay(0.15)
+	tween.tween_property(material, "albedo_color:a", 0.0, 0.15)
 
 func _on_timer_timeout():
 	queue_free()
