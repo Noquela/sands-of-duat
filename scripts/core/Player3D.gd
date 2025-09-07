@@ -143,38 +143,31 @@ func _perform_attack():
 	
 	var mouse_pos = get_viewport().get_mouse_position()
 	
-	# Convert mouse position to world space on the ground plane
-	var from = camera.project_ray_origin(mouse_pos)
-	var to = from + camera.project_ray_normal(mouse_pos) * 1000.0
+	# For isometric camera, we need to adjust the mouse direction mapping
+	# Convert screen coordinates to world coordinates properly for isometric view
 	
-	# Find intersection with ground plane (Y = 0)
-	var ground_y = global_position.y  # Use player's Y level
-	var ray_direction = (to - from).normalized()
+	# Get viewport center for relative positioning
+	var viewport_size = get_viewport().get_visible_rect().size
+	var screen_center = viewport_size * 0.5
+	var mouse_offset = mouse_pos - screen_center
 	
-	var attack_direction: Vector3
-	var attack_position: Vector3
+	# For isometric camera (45° rotated), map screen X/Y to world X/Z
+	# Screen horizontal = World X + Z diagonal
+	# Screen vertical = World X - Z diagonal  
+	var world_offset = Vector3.ZERO
 	
-	if abs(ray_direction.y) < 0.001:  # Ray is nearly parallel to ground
-		print("⚠️ Mouse ray parallel to ground, using forward direction")
+	# Apply isometric transformation - screen coordinates to world coordinates
+	# Inverted Z to match Godot's coordinate system
+	world_offset.x = (mouse_offset.x - mouse_offset.y) * 0.005  # Right/Left
+	world_offset.z = -(mouse_offset.x + mouse_offset.y) * 0.005  # Forward/Back
+	
+	# Calculate attack direction from player position
+	var attack_direction = world_offset.normalized()
+	if world_offset.length() < 50.0:  # Very small movement, use forward
 		attack_direction = -transform.basis.z
-		attack_position = global_position + attack_direction * 1.0
-		
-		if combat_system.has_method("perform_attack"):
-			var success = combat_system.perform_attack(self, attack_position, attack_direction)
-			if success:
-				print("⚔️ Khenti attacks forward!")
-		return
-	
-	# Calculate intersection point with ground plane
-	var t = (ground_y - from.y) / ray_direction.y
-	var ground_point = from + ray_direction * t
-	
-	# Calculate attack direction from player to ground point
-	attack_direction = (ground_point - global_position).normalized()
-	attack_direction.y = 0  # Keep attack horizontal
 	
 	# Attack position slightly in front of player
-	attack_position = global_position + attack_direction * 1.0
+	var attack_position = global_position + attack_direction * 1.0
 	
 	if combat_system.has_method("perform_attack"):
 		var success = combat_system.perform_attack(self, attack_position, attack_direction)
