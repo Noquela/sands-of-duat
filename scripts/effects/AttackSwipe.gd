@@ -14,6 +14,13 @@ func _ready():
 	# Animate the swipe effect
 	_animate_swipe()
 
+func set_direction(direction: Vector3):
+	# Orient the swipe effect toward the attack direction
+	if direction.length() > 0.1:
+		# Calculate rotation to face the direction
+		var target_rotation = atan2(-direction.x, -direction.z)
+		rotation.y = target_rotation
+
 func _animate_swipe():
 	if not mesh_instance:
 		return

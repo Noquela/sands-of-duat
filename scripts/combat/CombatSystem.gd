@@ -128,7 +128,11 @@ func _create_attack_effect(position: Vector3, direction: Vector3):
 		var effect = effect_scene.instantiate()
 		get_tree().current_scene.add_child(effect)
 		effect.global_position = position
-		effect.look_at(position + direction, Vector3.UP)
+		
+		# Set direction properly for the swipe effect
+		if effect.has_method("set_direction"):
+			effect.set_direction(direction)
+		
 		print("✨ Attack effect created at: " + str(position))
 
 func _create_hit_effect(target: Node3D):
