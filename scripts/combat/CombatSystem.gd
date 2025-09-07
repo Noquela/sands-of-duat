@@ -11,7 +11,7 @@ signal player_hit(damage: int)
 
 # Combat settings from roadmap
 const BASE_ATTACK_DAMAGE = 25
-const ATTACK_RANGE = 2.0
+const ATTACK_RANGE = 3.0
 const ATTACK_COOLDOWN = 0.5
 const CRIT_CHANCE = 0.15
 const CRIT_MULTIPLIER = 1.5
@@ -121,19 +121,23 @@ func _calculate_damage(attacker: Node3D, target: Node3D) -> int:
 	
 	return final_damage
 
-func _create_attack_effect(position: Vector3, direction: Vector3):
-	# Create visual attack effect
+func _create_attack_effect(_attack_position: Vector3, direction: Vector3):
+	# Create visual attack effect that extends from player toward attack direction
 	var effect_scene = preload("res://scenes/effects/AttackSwipe.tscn")
 	if effect_scene:
 		var effect = effect_scene.instantiate()
 		get_tree().current_scene.add_child(effect)
-		effect.global_position = position
 		
-		# Set direction properly for the swipe effect
-		if effect.has_method("set_direction"):
-			effect.set_direction(direction)
-		
-		print("✨ Attack effect created at: " + str(position))
+		# Find player position to start the attack from
+		var player = get_tree().get_first_node_in_group("player")
+		if player:
+			var player_pos = player.global_position
+			
+			# Setup attack effect from player toward direction with proper length
+			if effect.has_method("setup_attack_line"):
+				effect.setup_attack_line(player_pos, direction, ATTACK_RANGE)
+			
+			print("✨ Attack effect: from " + str(player_pos) + " toward " + str(direction))
 
 func _create_hit_effect(target: Node3D):
 	# Create hit flash effect on enemy

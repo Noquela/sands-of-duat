@@ -7,3 +7,4 @@ res://scripts/camera/IsometricCameraFollow.gd
 res://scripts/combat/CombatSystem.gd
 res://scripts/effects/AttackSwipe.gd
 res://scripts/enemies/BaseEnemy.gd
+res://scripts/effects/DashTrail.gd

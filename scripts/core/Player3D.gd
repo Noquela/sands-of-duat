@@ -28,6 +28,9 @@ func _ready():
 	print("⚔️ Khenti awakens in the Duat...")
 	print("🎮 Player Controller: Sprint 4 - Dash System Ready")
 	
+	# Add to player group for combat system to find
+	add_to_group("player")
+	
 	# Get system references
 	combat_system = get_node("/root/CombatSystem")
 	if not combat_system:
