@@ -8,8 +8,8 @@ extends Camera3D
 const CAMERA_DISTANCE = 12.0
 const CAMERA_HEIGHT = 8.0
 const CAMERA_ANGLE = -45.0  # degrees
-const FOLLOW_SPEED = 8.0  # Increased for smoother following
-const LOOK_AHEAD_DISTANCE = 2.0
+const FOLLOW_SPEED = 12.0  # High speed for responsive following
+const LOOK_AHEAD_DISTANCE = 0.5  # Reduced for more responsive following
 
 # Target to follow
 @export var target: Node3D
@@ -23,6 +23,9 @@ func _ready():
 	projection = PROJECTION_ORTHOGONAL
 	size = 20.0  # Orthogonal size for isometric view
 	fov = 45.0
+	
+	# Set fixed isometric rotation (45 degrees down, looking at XZ plane)
+	rotation_degrees = Vector3(45.0, 45.0, 0.0)
 	
 	# Calculate isometric offset
 	_setup_isometric_position()
@@ -69,13 +72,6 @@ func _process(delta):
 	
 	# Smooth camera movement
 	global_position = global_position.lerp(desired_position, FOLLOW_SPEED * delta)
-	
-	# Look at target with proper isometric angle
-	look_at(target_pos, Vector3.UP)
-	
-	# Ensure consistent isometric rotation
-	rotation_degrees.x = 45.0  # Fixed isometric angle
-	rotation_degrees.z = 0.0   # No roll
 
 # Camera shake for combat feedback (future sprint)
 func add_screen_shake(_intensity: float = 1.0):
