@@ -135,13 +135,51 @@ func _perform_attack():
 		print("⚠️ No combat system available for attack")
 		return
 	
-	var attack_position = global_position + transform.basis.z * -1.0  # Attack in front
-	var attack_direction = -transform.basis.z
+	# Get mouse direction in world space
+	var camera = get_viewport().get_camera_3d()
+	if not camera:
+		print("⚠️ No camera found for mouse direction")
+		return
+	
+	var mouse_pos = get_viewport().get_mouse_position()
+	
+	# Convert mouse position to world space on the ground plane
+	var from = camera.project_ray_origin(mouse_pos)
+	var to = from + camera.project_ray_normal(mouse_pos) * 1000.0
+	
+	# Find intersection with ground plane (Y = 0)
+	var ground_y = global_position.y  # Use player's Y level
+	var ray_direction = (to - from).normalized()
+	
+	var attack_direction: Vector3
+	var attack_position: Vector3
+	
+	if abs(ray_direction.y) < 0.001:  # Ray is nearly parallel to ground
+		print("⚠️ Mouse ray parallel to ground, using forward direction")
+		attack_direction = -transform.basis.z
+		attack_position = global_position + attack_direction * 1.0
+		
+		if combat_system.has_method("perform_attack"):
+			var success = combat_system.perform_attack(self, attack_position, attack_direction)
+			if success:
+				print("⚔️ Khenti attacks forward!")
+		return
+	
+	# Calculate intersection point with ground plane
+	var t = (ground_y - from.y) / ray_direction.y
+	var ground_point = from + ray_direction * t
+	
+	# Calculate attack direction from player to ground point
+	attack_direction = (ground_point - global_position).normalized()
+	attack_direction.y = 0  # Keep attack horizontal
+	
+	# Attack position slightly in front of player
+	attack_position = global_position + attack_direction * 1.0
 	
 	if combat_system.has_method("perform_attack"):
 		var success = combat_system.perform_attack(self, attack_position, attack_direction)
 		if success:
-			print("⚔️ Khenti attacks!")
+			print("⚔️ Khenti attacks toward mouse!")
 
 func _perform_dash():
 	if not dash_system:

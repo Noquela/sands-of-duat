@@ -44,9 +44,15 @@ func _animate_trail():
 	if not mesh_instance:
 		return
 	
-	var material = mesh_instance.get_surface_override_material(0)
-	if not material:
-		return
+	# Create fresh material every time
+	var material = StandardMaterial3D.new()
+	material.albedo_color = Color(0.2, 0.6, 1.0, 0.8)  # Blue energy
+	material.emission_enabled = true
+	material.emission = Color(0.1, 0.4, 1.0, 1)  # Blue glow
+	material.emission_energy = 2.0
+	material.flags_transparent = true
+	material.flags_unshaded = true
+	mesh_instance.set_surface_override_material(0, material)
 	
 	# Create fade out animation
 	var tween = create_tween()

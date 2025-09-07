@@ -31,7 +31,8 @@
       "Read(//c/**)",
       "WebFetch(domain:www.gamedeveloper.com)",
       "WebFetch(domain:hades.wiki.fextralife.com)",
-      "WebFetch(domain:www.thegamer.com)"
+      "WebFetch(domain:www.thegamer.com)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []
