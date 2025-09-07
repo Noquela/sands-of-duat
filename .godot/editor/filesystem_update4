@@ -1,1 +1,7 @@
 res://scenes/TestScene.tscn
+res://scripts/ui/MiniMap.gd
+res://scripts/core/GameManager.gd
+res://scripts/portals/RoomPortal.gd
+res://scripts/systems/RoomSystem.gd
+res://scripts/systems/PortalManager.gd
+res://scenes/portals/RoomPortal.tscn

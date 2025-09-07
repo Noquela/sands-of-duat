@@ -41,7 +41,7 @@ var room_system: Node  # Reference to RoomSystem autoload
 var room_positions: Dictionary = {}
 var current_room_index: int = 0
 
-@onready var canvas = $Canvas
+# Canvas drawing handled by Control's _draw method
 
 func _ready():
 	print("🗺️ MiniMap initialized - Navigation ready")

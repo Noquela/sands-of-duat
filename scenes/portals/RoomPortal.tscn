@@ -1,0 +1,52 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/portals/RoomPortal.gd" id="1_portal"]
+
+[sub_resource type="Gradient" id="Gradient_1"]
+colors = PackedColorArray(0.4, 0.8, 1, 1, 1, 1, 0.8, 0.8, 0.8, 0.4, 1, 0.3, 0.8, 0.4, 1, 0)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1"]
+lifetime_randomness = 0.3
+direction = Vector3(0, 1, 0)
+initial_velocity_min = 1.0
+initial_velocity_max = 2.5
+angular_velocity_min = -90.0
+angular_velocity_max = 90.0
+orbit_velocity_min = 0.3
+orbit_velocity_max = 0.8
+linear_accel_min = -0.3
+linear_accel_max = 0.3
+radial_accel_min = -0.2
+radial_accel_max = 0.2
+tangential_accel_min = -0.5
+tangential_accel_max = 0.5
+damping_min = 0.1
+damping_max = 0.2
+scale_min = 0.2
+scale_max = 0.6
+color = Color(0.8, 0.6, 1, 1)
+color_ramp = SubResource("Gradient_1")
+
+[node name="root" type="Area3D"]
+script = ExtResource("1_portal")
+
+[node name="PortalMesh" type="MeshInstance3D" parent="."]
+
+[node name="PortalCollision" type="CollisionShape3D" parent="."]
+
+[node name="PortalParticles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+emitting = false
+amount = 100
+lifetime = 3.0
+process_material = SubResource("ParticleProcessMaterial_1")
+
+[node name="PortalLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+billboard = 1
+no_depth_test = true
+text = "Próxima Sala"
+font_size = 32
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+modulate = Color(1, 1, 1, 0)

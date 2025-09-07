@@ -338,20 +338,37 @@ func _spawn_room_enemies():
 		return
 	
 	var template = current_room.template
-	var enemy_spawner = get_node_or_null("/root/EnemySpawner")
+	var basic_enemy_scene = preload("res://scenes/enemies/BasicEnemy.tscn")
 	
-	if not enemy_spawner:
-		print("⚠️ EnemySpawner not found - creating placeholder enemies")
-		return
+	# Clear any existing enemies first
+	var existing_enemies = get_tree().get_nodes_in_group("enemies")
+	for enemy in existing_enemies:
+		if is_instance_valid(enemy):
+			enemy.queue_free()
 	
-	# Spawn enemies at designated spawn points
+	# Wait a frame for cleanup
+	await get_tree().process_frame
+	
+	# Spawn new enemies at designated spawn points
+	print("👻 Spawning %d enemies for room: %s" % [template.enemy_count, template.name])
+	
 	for i in template.enemy_count:
 		if i < template.spawn_points.size():
 			var spawn_pos = template.spawn_points[i]
-			# TODO: Call enemy spawner when implemented
-			print("👻 Would spawn enemy at %s" % spawn_pos)
+			var enemy = basic_enemy_scene.instantiate()
+			
+			# Position the enemy
+			enemy.global_position = spawn_pos
+			enemy.add_to_group("enemies")
+			
+			# Add to scene
+			get_tree().current_scene.add_child(enemy)
+			
+			print("👻 Spawned enemy at %s" % spawn_pos)
 	
 	current_room.enemies_spawned = true
+	
+	print("✅ Room enemies spawned: %d enemies active" % get_tree().get_nodes_in_group("enemies").size())
 
 func clear_current_room():
 	"""Mark current room as cleared (all enemies defeated)"""
@@ -390,3 +407,6 @@ func get_room_progress() -> String:
 
 func is_room_cleared() -> bool:
 	return current_room.get("cleared", false)
+
+func get_available_doors() -> Array[Dictionary]:
+	return available_doors.duplicate()

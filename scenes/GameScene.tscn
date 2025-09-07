@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://b8yqwn1dxhj7x"]
+[gd_scene load_steps=9 format=3 uid="uid://b8yqwn1dxhj7x"]
 
 [ext_resource type="PackedScene" uid="uid://cqsb6yw86j2rl" path="res://scenes/player/Player.tscn" id="1_p3q8s"]
 [ext_resource type="Script" path="res://scripts/camera/IsometricCameraFollow.gd" id="2_l4mxd"]
-[ext_resource type="Script" path="res://scripts/core/GameController.gd" id="3_gamecontroller"]
+[ext_resource type="Script" path="res://scripts/core/GameManager.gd" id="3_gamemanager"]
 [ext_resource type="PackedScene" uid="uid://dd6f3l6q02fdt" path="res://scenes/enemies/BasicEnemy.tscn" id="4_enemy"]
+[ext_resource type="Script" path="res://scripts/ui/MiniMap.gd" id="5_minimap"]
 
 [sub_resource type="Environment" id="Environment_1nh4g"]
 background_mode = 1
@@ -19,7 +20,7 @@ size = Vector3(20, 0.2, 20)
 size = Vector3(20, 0.2, 20)
 
 [node name="GameScene" type="Node3D"]
-script = ExtResource("3_gamecontroller")
+script = ExtResource("3_gamemanager")
 
 [node name="Player" parent="." instance=ExtResource("1_p3q8s")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -55,6 +56,17 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
+[node name="MiniMap" type="Control" parent="UI"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -320.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 220.0
+script = ExtResource("5_minimap")
+
 [node name="DebugPanel" type="Panel" parent="UI"]
 layout_mode = 1
 anchors_preset = 0
@@ -71,19 +83,23 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
 theme_override_font_sizes/font_size = 16
-text = "SANDS OF DUAT - Sprint 3
-Combat System Base
+text = "SANDS OF DUAT - Sprint 6
+Room System + 3D Portals
 
 🎮 Controls:
 WASD - Movement
 Mouse Click - Attack
-F1 - Validate Sprint 3
-F2 - Player Info
-F3 - Camera Info
+Space - Dash
+1/2/3 - Special Abilities
+E - Enter Portal
+F1/F2/F3 - Select Doors (hotkeys)
+M - Toggle MiniMap
+F6 - Validate Sprint 6
 
+🏛️ Room system active
+🚪 3D Portal system active
+🗺️ MiniMap visible
 ⚔️ Combat system active
-👻 Enemies patrol and attack
-💔 Damage system functional
 ⚡ 60fps target maintained"
 vertical_alignment = 1
 

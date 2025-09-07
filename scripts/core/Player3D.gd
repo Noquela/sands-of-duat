@@ -148,6 +148,8 @@ func _handle_input():
 		_select_door(2)
 	if Input.is_action_just_pressed("toggle_minimap"):
 		_toggle_minimap()
+	if Input.is_action_just_pressed("validate_sprint_6"):
+		_validate_sprint_6()
 
 func _apply_movement(_delta):
 	# Convert 2D input to 3D isometric movement
@@ -271,6 +273,14 @@ func _toggle_minimap():
 		minimap.toggle_visibility()
 	else:
 		print("⚠️ Minimap not found")
+
+func _validate_sprint_6():
+	"""Validate Sprint 6 integration (F6 key)"""
+	var game_manager = get_node_or_null("..")
+	if game_manager and game_manager.has_method("validate_sprint_6"):
+		game_manager.validate_sprint_6()
+	else:
+		print("⚠️ GameManager not found")
 
 # Combat methods for integration with systems
 func take_damage(amount: int, damage_type: String = "physical"):

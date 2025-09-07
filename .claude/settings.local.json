@@ -34,7 +34,8 @@
       "WebFetch(domain:www.thegamer.com)",
       "Bash(dir:*)",
       "WebFetch(domain:godotforums.org)",
-      "WebFetch(domain:docs.godotengine.org)"
+      "WebFetch(domain:docs.godotengine.org)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []
