@@ -138,6 +138,16 @@ func _handle_input():
 		_use_ability("divine_projectile")
 	if Input.is_action_just_pressed("ability_3"):
 		_use_ability("divine_shield")
+	
+	# Handle room system inputs (Sprint 6)
+	if Input.is_action_just_pressed("door_1"):
+		_select_door(0)
+	if Input.is_action_just_pressed("door_2"):
+		_select_door(1)
+	if Input.is_action_just_pressed("door_3"):
+		_select_door(2)
+	if Input.is_action_just_pressed("toggle_minimap"):
+		_toggle_minimap()
 
 func _apply_movement(_delta):
 	# Convert 2D input to 3D isometric movement
@@ -240,6 +250,27 @@ func _remove_shield():
 	shield_damage_reduction = 0.0
 	shield_duration = 0.0
 	print("🛡️ Divine shield expired")
+
+func _select_door(door_index: int):
+	"""Select door to next room (Sprint 6)"""
+	var room_system = get_node_or_null("/root/RoomSystem")
+	if not room_system:
+		print("⚠️ No room system available")
+		return
+	
+	if room_system.is_room_cleared():
+		room_system.select_door(door_index)
+		print("🚪 Khenti selects door %d" % (door_index + 1))
+	else:
+		print("⚠️ Clear the room first before selecting a door!")
+
+func _toggle_minimap():
+	"""Toggle minimap visibility (Sprint 6)"""
+	var minimap = get_node_or_null("../UI/MiniMap")
+	if minimap and minimap.has_method("toggle_visibility"):
+		minimap.toggle_visibility()
+	else:
+		print("⚠️ Minimap not found")
 
 # Combat methods for integration with systems
 func take_damage(amount: int, damage_type: String = "physical"):
