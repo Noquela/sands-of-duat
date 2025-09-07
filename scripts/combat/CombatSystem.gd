@@ -75,9 +75,9 @@ func perform_attack(attacker: Node3D, attack_position: Vector3, attack_direction
 	
 	return true
 
-func _find_targets_in_range(position: Vector3, range: float) -> Array[Node3D]:
+func _find_targets_in_range(position: Vector3, attack_range: float) -> Array[Node3D]:
 	var targets: Array[Node3D] = []
-	var space_state = get_tree().current_scene.get_world_3d().direct_space_state
+	var _space_state = get_tree().current_scene.get_world_3d().direct_space_state
 	
 	# Find all enemies in range
 	var enemies = get_tree().get_nodes_in_group("enemies")
@@ -86,7 +86,7 @@ func _find_targets_in_range(position: Vector3, range: float) -> Array[Node3D]:
 			continue
 			
 		var distance = position.distance_to(enemy.global_position)
-		if distance <= range:
+		if distance <= attack_range:
 			targets.append(enemy)
 			print("🎯 Target found: " + enemy.name + " (distance: %.1f)" % distance)
 	

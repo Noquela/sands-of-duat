@@ -74,7 +74,7 @@ func _process(delta):
 	look_at(target_pos, Vector3.UP)
 
 # Camera shake for combat feedback (future sprint)
-func add_screen_shake(intensity: float = 1.0):
+func add_screen_shake(_intensity: float = 1.0):
 	# Placeholder for future combat integration
 	pass
 

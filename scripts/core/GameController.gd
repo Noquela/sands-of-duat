@@ -12,14 +12,16 @@ var fps_counter: float = 0.0
 var fps_timer: float = 0.0
 
 func _ready():
-	print("🏺⚔️ SANDS OF DUAT - Sprint 3 Validation")
-	print("=" * 50)
-	print("✅ Player Controller: WASD Movement + Combat")
+	print("🏺⚔️ SANDS OF DUAT - Sprint 4 Validation")
+	print("==================================================")  # Fixed string multiplication error
+	print("✅ Player Controller: WASD Movement + Combat + Dash")
+	print("✅ Dash System: 4-unit distance, stamina management")
+	print("✅ Dash Attack: 35 damage in 2.5 unit range")
 	print("✅ Combat System: Attack, Damage, Health")
 	print("✅ Enemy AI: Detection, Chase, Attack")
 	print("✅ Isometric Camera: Following system") 
 	print("✅ Resolution: 3440x1440 configured")
-	print("=" * 50)
+	print("==================================================")  # Fixed string multiplication error
 	
 	# Setup validation timer
 	var timer = Timer.new()
@@ -49,13 +51,21 @@ func _update_debug_info():
 		if enemy.has_method("is_alive") and enemy.is_alive():
 			alive_enemies += 1
 	
-	var debug_text = "SANDS OF DUAT - Sprint 3
-Combat System Base
+	# Get dash system stats
+	var dash_stats = DashSystem.get_dash_stats() if DashSystem else {}
+	var stamina = dash_stats.get("current_stamina", 0)
+	var max_stamina = dash_stats.get("max_stamina", 100)
+	var can_dash = dash_stats.get("can_dash", false)
+	var is_dashing = dash_stats.get("is_dashing", false)
+	
+	var debug_text = "SANDS OF DUAT - Sprint 4
+Dash System
 
 🎮 Controls:
 WASD - Movement
-Mouse Click - Attack
-F1 - Validate Sprint 3
+Mouse Click - Attack  
+SPACE - Dash (25 stamina)
+F1 - Validate Sprint 4
 F2 - Player Info
 F3 - Camera Info
 
@@ -69,6 +79,11 @@ Velocity: (%.1f, %.1f, %.1f)
 Health: %d/%d HP
 On Floor: %s
 
+🏃 Dash System:
+Stamina: %.0f/%.0f
+Can Dash: %s
+Is Dashing: %s
+
 👻 Combat Status:
 Enemies Alive: %d/%d
 Combat System: %s
@@ -81,6 +96,9 @@ Distance: %.1f units" % [
 		player_vel.x, player_vel.y, player_vel.z,
 		player.get_health(), player.get_max_health(),
 		str(player.is_on_floor()),
+		stamina, max_stamina,
+		"Yes" if can_dash else "No",
+		"Yes" if is_dashing else "No",
 		alive_enemies, enemy_count,
 		"Active" if CombatSystem else "Missing",
 		cam_pos.x, cam_pos.y, cam_pos.z,
@@ -95,12 +113,12 @@ func _input(event):
 			KEY_F1:
 				_validate_sprint_2()
 			KEY_ESCAPE:
-				print("🚪 Exiting Sprint 3...")
+				print("🚪 Exiting Sprint 4...")
 				get_tree().quit()
 
 func _validate_sprint_2():
-	print("🔍 SPRINT 3 VALIDATION:")
-	print("=" * 30)
+	print("🔍 SPRINT 4 VALIDATION:")
+	print("==============================")  # Fixed string multiplication error
 	
 	# Check player movement
 	var can_move = player.has_method("_handle_input")
@@ -110,9 +128,26 @@ func _validate_sprint_2():
 	var can_attack = player.has_method("_perform_attack")
 	print("✅ Player Attack System: " + ("OK" if can_attack else "FAILED"))
 	
+	# Check player dash
+	var can_dash_method = player.has_method("_perform_dash")
+	print("✅ Player Dash System: " + ("OK" if can_dash_method else "FAILED"))
+	
 	# Check player health
 	var has_health = player.has_method("get_health")
 	print("✅ Player Health System: " + ("OK" if has_health else "FAILED"))
+	
+	# Check player invulnerability
+	var has_invuln = player.has_method("set_invulnerable")
+	print("✅ Player Invulnerability: " + ("OK" if has_invuln else "FAILED"))
+	
+	# Check dash system
+	var dash_active = DashSystem != null
+	print("✅ Dash System: " + ("OK" if dash_active else "FAILED"))
+	
+	# Check dash stats
+	var dash_stats = DashSystem.get_dash_stats() if DashSystem else {}
+	var has_stamina = "current_stamina" in dash_stats and "max_stamina" in dash_stats
+	print("✅ Stamina System: " + ("OK (%.0f/%.0f)" % [dash_stats.get("current_stamina", 0), dash_stats.get("max_stamina", 100)] if has_stamina else "FAILED"))
 	
 	# Check combat system
 	var combat_active = CombatSystem != null
@@ -134,12 +169,16 @@ func _validate_sprint_2():
 	var physics_ok = player.is_on_floor()
 	print("✅ Physics/Collision: " + ("OK" if physics_ok else "CHECK"))
 	
-	print("=" * 30)
+	print("==============================")  # Fixed string multiplication error
 	
-	if can_move and can_attack and has_health and combat_active and enemy_count > 0 and has_target and fps_ok:
-		print("🎉 SPRINT 3 VALIDATION: SUCCESS!")
-		print("Ready for Sprint 4: Dash System")
+	var all_systems_ok = (can_move and can_attack and can_dash_method and has_health and 
+						  has_invuln and dash_active and has_stamina and combat_active and 
+						  enemy_count > 0 and has_target and fps_ok)
+	
+	if all_systems_ok:
+		print("🎉 SPRINT 4 VALIDATION: SUCCESS!")
+		print("Ready for Sprint 5: Egyptian Weapons")
 	else:
-		print("⚠️ SPRINT 3 VALIDATION: Issues detected")
+		print("⚠️ SPRINT 4 VALIDATION: Issues detected")
 	
-	print("=" * 30)
+	print("==============================")  # Fixed string multiplication error

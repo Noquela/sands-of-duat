@@ -18,17 +18,26 @@ var movement_vector: Vector3
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 @onready var health_system: Node = $HealthSystem
 
-# Combat system reference
+# System references
 var combat_system: Node
+var dash_system: Node
+var is_invulnerable: bool = false
+var invulnerability_timer: float = 0.0
 
 func _ready():
 	print("⚔️ Khenti awakens in the Duat...")
-	print("🎮 Player Controller: Sprint 3 - Combat Ready")
+	print("🎮 Player Controller: Sprint 4 - Dash System Ready")
 	
-	# Get combat system reference
+	# Get system references
 	combat_system = get_node("/root/CombatSystem")
 	if not combat_system:
 		print("⚠️ Combat system not found!")
+	
+	dash_system = get_node("/root/DashSystem")
+	if not dash_system:
+		print("⚠️ Dash system not found!")
+	else:
+		print("🏃 Dash system connected")
 	
 	# Setup health system
 	if health_system:
@@ -50,6 +59,12 @@ func _ready():
 			print("🏺 Egyptian material applied")
 
 func _physics_process(delta):
+	# Handle invulnerability timer
+	if invulnerability_timer > 0:
+		invulnerability_timer -= delta
+		if invulnerability_timer <= 0:
+			is_invulnerable = false
+	
 	# Handle gravity
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
@@ -57,11 +72,18 @@ func _physics_process(delta):
 	# Get input
 	_handle_input()
 	
-	# Apply movement
-	_apply_movement(delta)
+	# Handle dash movement first (overrides normal movement)
+	if dash_system and dash_system.is_dashing:
+		var dash_velocity = dash_system.get_dash_velocity()
+		velocity.x = dash_velocity.x
+		velocity.z = dash_velocity.z
+	else:
+		# Apply normal movement
+		_apply_movement(delta)
 	
-	# Rotate character to face movement direction
-	_rotate_to_movement()
+	# Rotate character to face movement direction (except during dash)
+	if not (dash_system and dash_system.is_dashing):
+		_rotate_to_movement()
 	
 	# Move character
 	move_and_slide()
@@ -86,8 +108,12 @@ func _handle_input():
 	# Handle attack input
 	if Input.is_action_just_pressed("attack"):
 		_perform_attack()
+	
+	# Handle dash input
+	if Input.is_action_just_pressed("dash"):
+		_perform_dash()
 
-func _apply_movement(delta):
+func _apply_movement(_delta):
 	# Convert 2D input to 3D isometric movement
 	# For isometric view, we map:
 	# Input X -> World X
@@ -117,12 +143,32 @@ func _perform_attack():
 		if success:
 			print("⚔️ Khenti attacks!")
 
+func _perform_dash():
+	if not dash_system:
+		print("⚠️ No dash system available")
+		return
+	
+	if dash_system.has_method("attempt_dash"):
+		var success = dash_system.attempt_dash(self, input_vector)
+		if success:
+			print("🏃 Khenti dashes!")
+
 # Combat methods for integration with systems
 func take_damage(amount: int, damage_type: String = "physical"):
+	# Check invulnerability (from dash or damage immunity)
+	if is_invulnerable:
+		print("🛡️ Khenti is invulnerable - damage blocked!")
+		return
+	
 	if health_system and health_system.has_method("take_damage"):
 		health_system.take_damage(amount, damage_type)
 	else:
 		print("💔 Player took %d %s damage (no health system)" % [amount, damage_type])
+
+func set_invulnerable(duration: float):
+	is_invulnerable = true
+	invulnerability_timer = duration
+	print("🛡️ Khenti gains %.1fs invulnerability" % duration)
 
 func get_health() -> int:
 	return health_system.get_health() if health_system else 100

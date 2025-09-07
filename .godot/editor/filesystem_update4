@@ -1,1 +1,7 @@
 res://scenes/TestScene.tscn
+res://scenes/effects/AttackSwipe.tscn
+res://scenes/effects/DashTrail.tscn
+res://scripts/core/Player3D.gd
+res://scripts/core/GameController.gd
+res://scripts/camera/IsometricCameraFollow.gd
+res://scripts/combat/CombatSystem.gd
