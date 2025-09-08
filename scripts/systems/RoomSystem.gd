@@ -326,7 +326,13 @@ func _handle_treasure_room():
 	# Spawn enemies like a combat room
 	_spawn_room_enemies()
 	
-	print("🏺 RoomSystem: Enemies spawned in boon room - defeat them to claim divine blessing!")
+	# If no enemies were spawned, immediately trigger boon drop
+	var enemy_count = current_room.template.enemy_count
+	if enemy_count <= 0:
+		print("🏺 RoomSystem: No enemies in treasure room - immediate boon reward!")
+		call_deferred("_spawn_physical_boon")  # Defer to next frame
+	else:
+		print("🏺 RoomSystem: Enemies spawned in boon room - defeat them to claim divine blessing!")
 
 func select_door(door_index: int):
 	"""Player selects a door to proceed to next room"""
