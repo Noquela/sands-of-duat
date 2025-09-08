@@ -308,8 +308,25 @@ func enter_room():
 	if current_room.type in [RoomType.COMBAT, RoomType.ELITE, RoomType.BOSS]:
 		_spawn_room_enemies()
 	
+	# Handle treasure/boon rooms
+	elif current_room.type == RoomType.TREASURE:
+		print("🏺 Entered boon room - triggering divine blessing selection")
+		_handle_treasure_room()
+	
 	# Emit signal
 	room_entered.emit(RoomType.keys()[current_room.type], current_room)
+
+func _handle_treasure_room():
+	"""Handle treasure room entry - spawn enemies, boon drops after combat"""
+	print("🏺 RoomSystem: Processing treasure room - spawning enemies before boon reward...")
+	
+	# Mark this as a boon room for later reward
+	current_room.is_boon_room = true
+	
+	# Spawn enemies like a combat room
+	_spawn_room_enemies()
+	
+	print("🏺 RoomSystem: Enemies spawned in boon room - defeat them to claim divine blessing!")
 
 func select_door(door_index: int):
 	"""Player selects a door to proceed to next room"""
@@ -382,6 +399,11 @@ func clear_current_room():
 	
 	print("✅ Room cleared: %s (%.1fs)" % [current_room.template.name, completion_time])
 	
+	# Check if this was a boon room - spawn physical boon drop
+	if current_room.get("is_boon_room", false):
+		print("🏺 Boon room cleared! Spawning divine blessing on ground...")
+		_spawn_physical_boon()
+	
 	# Show doors for next room
 	_show_exit_doors()
 	
@@ -410,3 +432,87 @@ func is_room_cleared() -> bool:
 
 func get_available_doors() -> Array[Dictionary]:
 	return available_doors.duplicate()
+
+func _spawn_physical_boon():
+	"""Spawn a physical boon item on the ground for collection"""
+	print("🏺 RoomSystem: Creating physical boon drop...")
+	
+	# Get boon system reference
+	var boon_system = get_node_or_null("/root/BoonSystem")
+	if not boon_system:
+		print("⚠️ RoomSystem: BoonSystem not found!")
+		return
+	
+	# Generate boon options for this drop
+	if not boon_system.has_method("generate_boon_options"):
+		print("⚠️ RoomSystem: BoonSystem missing generate_boon_options method!")
+		return
+	
+	var boon_options = boon_system.generate_boon_options(3, false)  # 3 options, no rarity boost
+	if boon_options.is_empty():
+		print("⚠️ RoomSystem: No boon options generated!")
+		return
+	
+	# Create the physical boon drop scene - placeholder for now
+	print("⚠️ RoomSystem: BoonDrop scene not implemented yet, creating placeholder...")
+	_create_placeholder_boon(boon_options)
+	print("🏺 RoomSystem: Boon placeholder spawned at center!")
+
+func _create_placeholder_boon(boon_options: Array):
+	"""Create a simple placeholder boon drop until proper scene exists"""
+	print("🏺 Creating placeholder boon drop...")
+	
+	# Create a simple MeshInstance3D as placeholder
+	var placeholder = MeshInstance3D.new()
+	placeholder.name = "BoonDropPlaceholder"
+	
+	# Create a golden sphere mesh
+	var sphere_mesh = SphereMesh.new()
+	sphere_mesh.radius = 0.5
+	sphere_mesh.height = 1.0
+	placeholder.mesh = sphere_mesh
+	
+	# Create golden material
+	var material = StandardMaterial3D.new()
+	material.albedo_color = Color(1.0, 0.8, 0.0)  # Egyptian gold
+	material.emission_enabled = true
+	material.emission = Color(0.8, 0.6, 0.0, 0.3)  # Glowing effect
+	placeholder.material_override = material
+	
+	# Add to scene
+	get_tree().current_scene.add_child(placeholder)
+	placeholder.global_position = Vector3(0, 1, 0)
+	
+	# Add collection area
+	var area = Area3D.new()
+	var collision = CollisionShape3D.new()
+	var shape = SphereShape3D.new()
+	shape.radius = 1.5
+	collision.shape = shape
+	area.add_child(collision)
+	placeholder.add_child(area)
+	
+	# Connect collection signal
+	area.body_entered.connect(_on_boon_collected.bind(boon_options, placeholder))
+	
+	print("🏺 Placeholder boon drop created - walk into it to collect!")
+
+func _on_boon_collected(boon_options: Array, drop_node: Node3D, body: Node3D):
+	"""Handle boon collection by player"""
+	if body.name != "Player":
+		return
+	
+	print("🏺 Player collected physical boon! Opening selection...")
+	
+	# Remove the physical drop
+	drop_node.queue_free()
+	
+	# Trigger boon selection UI
+	var boon_system = get_node_or_null("/root/BoonSystem")
+	if boon_system and boon_system.has_method("show_boon_selection_with_options"):
+		boon_system.show_boon_selection_with_options(boon_options)
+	elif boon_system and boon_system.has_method("offer_boon_selection"):
+		# Fallback to regular boon selection
+		boon_system.offer_boon_selection(false)
+	
+	print("🏺 Boon selection triggered after physical collection!")

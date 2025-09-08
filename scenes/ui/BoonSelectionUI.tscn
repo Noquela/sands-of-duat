@@ -1,0 +1,53 @@
+[gd_scene load_steps=2 format=3 uid="uid://cxhjsqtlr5n5f"]
+
+[ext_resource type="Script" path="res://scripts/ui/BoonSelectionUI.gd" id="1_w2v8r"]
+
+[node name="BoonSelectionUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_w2v8r")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.8)
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -300.0
+offset_right = 400.0
+offset_bottom = 300.0
+
+[node name="Title" type="Label" parent="MainContainer"]
+layout_mode = 2
+text = "BÊNÇÃOS DIVINAS DO EGITO"
+horizontal_alignment = 1
+
+[node name="Spacer1" type="Control" parent="MainContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+
+[node name="BoonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+
+[node name="Spacer2" type="Control" parent="MainContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="Instructions" type="Label" parent="MainContainer"]
+layout_mode = 2
+text = "Escolha uma bênção divina para fortalecer Khenti
+Pressione 1, 2, ou 3 para seleção rápida"
+horizontal_alignment = 1

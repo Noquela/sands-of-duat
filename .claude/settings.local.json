@@ -35,7 +35,9 @@
       "Bash(dir:*)",
       "WebFetch(domain:godotforums.org)",
       "WebFetch(domain:docs.godotengine.org)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "WebFetch(domain:www.pointnthink.fr)",
+      "WebFetch(domain:medium.com)"
     ],
     "deny": [],
     "ask": []

@@ -150,6 +150,10 @@ func _handle_input():
 		_toggle_minimap()
 	if Input.is_action_just_pressed("validate_sprint_6"):
 		_validate_sprint_6()
+	
+	# Test boon selection (Sprint 7)
+	if Input.is_action_just_pressed("test_boon_selection"):
+		_test_boon_selection()
 
 func _apply_movement(_delta):
 	# Convert 2D input to 3D isometric movement
@@ -173,7 +177,7 @@ func _perform_attack():
 		print("⚠️ No combat system available for attack")
 		return
 	
-	# Get mouse direction in world space
+	# Get mouse direction in world space using proper raycasting
 	var camera = get_viewport().get_camera_3d()
 	if not camera:
 		print("⚠️ No camera found for mouse direction")
@@ -181,28 +185,33 @@ func _perform_attack():
 	
 	var mouse_pos = get_viewport().get_mouse_position()
 	
-	# For isometric camera, we need to adjust the mouse direction mapping
-	# Convert screen coordinates to world coordinates properly for isometric view
+	# Use camera to project mouse position to world coordinates
+	var from = camera.project_ray_origin(mouse_pos)
+	var to = from + camera.project_ray_normal(mouse_pos) * 1000
 	
-	# Get viewport center for relative positioning
-	var viewport_size = get_viewport().get_visible_rect().size
-	var screen_center = viewport_size * 0.5
-	var mouse_offset = mouse_pos - screen_center
+	# Create a raycast to find the ground intersection
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from, to)
+	query.collision_mask = 4  # Ground layer only
 	
-	# For isometric camera (45° rotated), map screen X/Y to world X/Z
-	# Screen horizontal = World X + Z diagonal
-	# Screen vertical = World X - Z diagonal  
-	var world_offset = Vector3.ZERO
+	var result = space_state.intersect_ray(query)
 	
-	# Apply isometric transformation - screen coordinates to world coordinates
-	# Inverted Z to match Godot's coordinate system
-	world_offset.x = (mouse_offset.x - mouse_offset.y) * 0.005  # Right/Left
-	world_offset.z = -(mouse_offset.x + mouse_offset.y) * 0.005  # Forward/Back
+	var attack_target: Vector3
+	var attack_direction: Vector3
 	
-	# Calculate attack direction from player position
-	var attack_direction = world_offset.normalized()
-	if world_offset.length() < 50.0:  # Very small movement, use forward
-		attack_direction = -transform.basis.z
+	if result:
+		# Mouse is pointing at ground - attack toward that point
+		attack_target = result.position
+		attack_direction = (attack_target - global_position).normalized()
+	else:
+		# No ground intersection - use projected direction on player's Y level
+		var ground_intersection = Vector3(
+			from.x + camera.project_ray_normal(mouse_pos).x * (from.y - global_position.y) / -camera.project_ray_normal(mouse_pos).y,
+			global_position.y,
+			from.z + camera.project_ray_normal(mouse_pos).z * (from.y - global_position.y) / -camera.project_ray_normal(mouse_pos).y
+		)
+		attack_target = ground_intersection
+		attack_direction = (attack_target - global_position).normalized()
 	
 	# Attack position slightly in front of player
 	var attack_position = global_position + attack_direction * 1.0
@@ -210,7 +219,7 @@ func _perform_attack():
 	if combat_system.has_method("perform_attack"):
 		var success = combat_system.perform_attack(self, attack_position, attack_direction)
 		if success:
-			print("⚔️ Khenti attacks toward mouse!")
+			print("⚔️ Khenti attacks toward mouse at: %s!" % attack_target)
 
 func _perform_dash():
 	if not dash_system:
@@ -281,6 +290,21 @@ func _validate_sprint_6():
 		game_manager.validate_sprint_6()
 	else:
 		print("⚠️ GameManager not found")
+
+func _test_boon_selection():
+	"""Test boon selection UI directly (F7 key)"""
+	print("🏺 Player: Testing boon selection UI...")
+	
+	var boon_system = get_node_or_null("/root/BoonSystem")
+	if not boon_system:
+		print("⚠️ BoonSystem not found!")
+		return
+	
+	if boon_system.has_method("offer_boon_selection"):
+		boon_system.offer_boon_selection(false)
+		print("🏺 Test boon selection triggered!")
+	else:
+		print("⚠️ BoonSystem doesn't have offer_boon_selection method!")
 
 # Combat methods for integration with systems
 func take_damage(amount: int, damage_type: String = "physical"):

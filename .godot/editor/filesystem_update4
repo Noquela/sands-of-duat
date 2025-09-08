@@ -5,3 +5,5 @@ res://scripts/portals/RoomPortal.gd
 res://scripts/systems/RoomSystem.gd
 res://scripts/systems/PortalManager.gd
 res://scenes/portals/RoomPortal.tscn
+res://scripts/ui/BoonSelectionUI.gd
+res://scripts/systems/BoonSystem.gd

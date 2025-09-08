@@ -619,43 +619,246 @@ python complete_artistic_pipeline.py --style hades --quality high
 
 ---
 
-# Fase 1: Setup e Foundation (Semanas 1-4)
+# 🚀 SANDS OF DUAT - REORGANIZED ROADMAP
+*Realistic implementation order for solo Claude Code development*
 
-## Sprint 1: Setup Completo (Semana 1)
+---
 
-### Objetivos
-Preparar ambiente completo de desenvolvimento
+## 📍 **CURRENT STATUS ASSESSMENT**
 
-### Para Você (Setup da IA)
-1. **Instalar ComfyUI + Flux Dev**
-2. **Configurar TripoSR local**
-3. **Testar pipeline de geração**
-4. **Criar primeiro asset de teste**
+**✅ IMPLEMENTADO (Sprint 1-7 Complete):**
+- Project setup & structure 
+- Player movement & camera
+- Combat system basics (3 weapons)
+- Basic enemy AI (3 types)
+- Dash system with i-frames
+- Room system (procedural generation)
+- Boon system (20 boons, 4 gods)
+- Reward system integration
+- GameManager connecting all systems
+- Save/load functionality
 
-### Para Claude Code (Sessão 1)
+**🎯 PRÓXIMO: Sprint 8 - Foundation Completion**
+
+---
+
+# 🔄 REORGANIZED SPRINT SEQUENCE
+
+## **FASE 1: CORE MVP (Sprints 8-12) - Foundation Solid**
+
+### Sprint 8: Status Effects & Combat Polish
+**Priority: Complete combat system before expanding content**
 ```
-"Crie um projeto Godot 4.3 novo com:
+StatusEffectSystem.gd:
+- Burn, Chill, Weak, Charmed, Doom, Blessed
+- Visual indicators and timers
+- Integration with all weapons and boons
 
-Estrutura de pastas:
-- scenes/ (Player, Enemies, Rooms, UI)
-- scripts/ (core, combat, ai, systems)
-- assets/ (characters, environment, audio)
-- data/ (boons, weapons, enemies)
+CombatPolish.gd:
+- Hit feedback improvements
+- Animation canceling refinement
+- Audio integration
+- Performance optimization
 
-Setup inicial:
-- Projeto 3D configurado
-- Configurações de rendering para cel-shade
-- Git repository inicializado
-- Primeira cena de teste vazia
-
-Entregável: Projeto que compila e roda vazio a 60fps"
+Target: Combat feels satisfying and complete
 ```
 
-### Deliverables Sprint 1
-- [ ] Projeto Godot funcionando
-- [ ] Pipeline IA testada com 1 modelo
-- [ ] Estrutura de pastas completa
-- [ ] Git configurado
+### Sprint 9: Enemy Expansion & AI Enhancement  
+**Priority: Need variety before building more systems**
+```
+8 New Enemy Types:
+1. Pharaoh Mage (teleport + projectiles)
+2. Scarab Swarm (numbers + speed)
+3. Stone Golem (tank + smash)
+4. Shadow Wraith (phase through walls)
+5. Cobra Striker (fast dash attacks)
+6. Jackal Hunter (pack coordination)
+7. Mummy Brute (heavy melee)
+8. Sand Tornado (area control)
+
+AI Improvements:
+- Group coordination systems
+- Player prediction algorithms
+- Elite variants (+50% stats)
+- Spawn balancing by room
+```
+
+### Sprint 10: Weapon System Complete
+**Priority: Need all weapons before aspects/mastery**
+```
+Complete 5 Egyptian Weapons:
+1. Was Scepter (complete) ✅
+2. Khopesh (refine combos)
+3. Spear of Ra (range + thrust)
+4. Staff of Thoth (magic AOE)
+5. Bow of the Winds (ranged + charged)
+
+WeaponSystem.gd:
+- Unique movesets per weapon
+- Special abilities integration
+- Smooth switching system
+- Balance pass across all weapons
+```
+
+### Sprint 11: Advanced Boon System
+**Priority: Core progression needs to be rich before meta-progression**
+```
+Expand to 50+ Boons:
+- Duo Boons (god combinations)
+- Legendary Boons (game-changers)
+- Boon evolution system (Pom equivalent)
+- Advanced synergies
+- Rarity system refinement
+
+Target: 100+ viable build combinations
+```
+
+### Sprint 12: First Boss Complete
+**Priority: Need victory condition before meta systems**
+```
+Khaemwaset Boss Battle:
+- 4-phase fight with narrative integration
+- Environmental mechanics
+- Difficulty scaling
+- Victory rewards
+- Death/retry flow
+
+Boss Arena:
+- Interactive environment
+- Phase-specific mechanics
+- Visual storytelling elements
+```
+
+---
+
+## **FASE 2: NARRATIVE INTEGRATION (Sprints 13-16)**
+
+### Sprint 13: Hub World Foundation
+**Priority: Death needs to be meaningful now that core works**
+```
+Pool of Memories:
+- Central hub area implementation
+- Basic NPC system
+- Death return mechanics
+- Memory Fragment currency
+- Hub navigation and layout
+```
+
+### Sprint 14: Meta-Progression System
+**Priority: Permanent progression unlocks depth**
+```
+MemoryUpgrade system:
+- 30+ permanent upgrades
+- Multiple currency types
+- Unlock gates (story + mechanical)
+- Progression tree visualization
+- Save integration
+```
+
+### Sprint 15: Dialogue & Narrative
+**Priority: Hub needs personality and story**
+```
+Dialogue System:
+- Branching conversations
+- Relationship tracking
+- Story progression gates
+- Choice consequences
+- NPC personality systems
+```
+
+### Sprint 16: Second Biome
+**Priority: Content expansion after systems solid**
+```
+Rio de Fogo biome:
+- 15 new room layouts
+- Fire-themed enemies (5 types)
+- Environmental hazards
+- Biome progression system
+- Boss: Sekhmet
+```
+
+---
+
+## **FASE 3: DEPTH & POLISH (Sprints 17-20)**
+
+### Sprint 17: Combat Juice & Feedback
+**Priority: Make existing combat feel amazing**
+```
+Combat Polish:
+- Screen shake system
+- Hit pause/freeze frames  
+- Particle effects overhaul
+- Audio feedback improvements
+- Animation improvements
+```
+
+### Sprint 18: Advanced Systems
+**Priority: Add complexity to proven foundation**
+```
+Weapon Aspects:
+- 4 aspects per weapon (20 total)
+- Hidden aspects (endgame unlocks)
+- Visual customization
+- Aspect-specific boons
+
+Heat System:
+- Difficulty scaling options
+- Challenge modifiers
+- Better rewards for higher heat
+```
+
+### Sprint 19: Third Biome
+**Priority: More content variety**
+```
+Salão do Julgamento:
+- 15 room layouts
+- Judgment-themed mechanics
+- Moral choice systems
+- Boss: Ammit
+- Environmental storytelling
+```
+
+### Sprint 20: Final Boss & Endings
+**Priority: Complete victory conditions**
+```
+Osiris Final Battle:
+- Multi-phase epic encounter
+- 4 different endings based on choices
+- Ending cinematics
+- New Game+ setup
+- Achievement system
+```
+
+---
+
+## **CRITICAL SUCCESS FACTORS**
+
+### **Sprint Dependency Rules:**
+1. **Never start content before systems work**
+2. **Complete vertical slice before expanding horizontal**
+3. **Polish existing before adding new**
+4. **Test integration after every sprint**
+
+### **Integration Requirements (Every Sprint):**
+- All new systems connect to GameManager
+- UI updates in real-time
+- Save/load compatibility maintained
+- Performance targets met (60fps)
+- No systems exist in isolation
+
+### **MVP Definition (Sprint 12):**
+- Complete combat system (5 weapons, status effects)
+- 15+ enemy types with good AI
+- 50+ boons with synergies
+- 1 complete biome (15 rooms)
+- 1 complete boss fight
+- Basic progression system
+
+### **Polish Priority (Sprints 17-20):**
+- Make existing systems feel amazing
+- Add narrative depth
+- Expand content variety
+- Perfect balance and difficulty
 
 ## Sprint 2: Player Controller Base (Semana 2)
 
@@ -2152,6 +2355,261 @@ Todos os assets gerados devem seguir:
 **Ready to start building Sands of Duat? Use Sprint 1!**
 
 ---
+
+# HADES-INSPIRED REALIGNMENT ROADMAP 🎯
+*Based on comprehensive analysis - Focus on Narrative Integration & Polish over Visual*
+
+## ⚡ SPRINT 9: HUB WORLD & NARRATIVE INTEGRATION
+**Pool of Memories - Central Hub Implementation**
+
+### Para Claude Code (Sessão 9):
+```
+"Implemente hub world seguindo análise Hades vs Sand of Duat:
+
+HubWorld.gd (Pool of Memories):
+- Área central no primeiro bioma que Khenti descobre
+- Pool reflexivo que mostra flashbacks da vida passada
+- NPCs: Ecos de pessoas importantes (Nefertari, família, amigos)
+- Cada morte retorna Khenti aqui para progressão narrativa
+
+MemorySystem.gd - NARRATIVE-DRIVEN PROGRESSION:
+- Memory Fragments como currency principal
+- 30+ upgrades baseados no passado de Khenti
+- Unlock gates narrativos (não só mechanical)
+- Cada upgrade revela mais da conspiração
+
+DialogueSystem.gd:
+- Sistema de diálogo com NPCs do hub
+- Branching dialogue baseado em progresso
+- Relationship system com personagens importantes
+- Revelação gradual da verdade sobre assassinato
+
+NarrativeManager.gd:
+- Track player moral choices
+- Influence NPC dialogue based on actions
+- Build toward 4 different endings
+- Death integration: cada morte = more memories recovered
+
+INTEGRATION REQUIREMENTS:
+- Hub accessible from any biome upon death
+- NPCs evolve dialogue based on run progress
+- Memory purchases immediately affect gameplay
+- Narrative state persists across sessions
+
+TARGET: Death becomes narratively meaningful, not just mechanical reset"
+```
+
+## ⚡ SPRINT 10: WEAPON ASPECTS & MASTERY
+**Egyptian Weapon System Complete**
+
+### Para Claude Code (Sessão 10):
+```
+"Expand weapon system following Hades weapon aspect model:
+
+WeaponAspect.gd:
+- 4 aspects per weapon (20 total aspects)
+- Each aspect changes playstyle significantly
+- Divine Essence currency for upgrades (like Titan Blood)
+
+Was Scepter Aspects:
+- Aspect of Ra: Solar damage, light beams
+- Aspect of Khnum: Earth/craft focus, defensive
+- Aspect of Ptah: Creation magic, AOE focus
+- Hidden Aspect of Set: Chaos/corruption powers (endgame unlock)
+
+Khopesh Aspects:
+- Pharaoh's Blade: Royal combos, execution moves
+- Executioner's Edge: Critical hit focus
+- Defender's Curve: Counter-attack focused
+- Hidden Aspect: Anubis's Judgment (endgame)
+
+WeaponMastery.gd:
+- Mastery system per weapon (like Heat)
+- Unlock new combos through usage
+- Weapon-specific achievements
+- Visual evolution as weapon gains power
+
+NARRATIVE INTEGRATION:
+- Each aspect tied to Egyptian mythology
+- Hidden aspects unlock through story progression
+- Weapon choice affects NPC dialogue
+- Aspects influence ending paths"
+```
+
+## ⚡ SPRINT 11: ADVANCED BOON & SYNERGY SYSTEM
+**Complete Egyptian Divine System**
+
+### Para Claude Code (Sessão 11):
+```
+"Implement full Hades boon complexity:
+
+DuoBoons.gd - God Combinations:
+- Ra + Bastet: Solar Shield (fire damage + protection)
+- Thoth + Anubis: Judgment's Wisdom (execute + mana restore)
+- Ra + Anubis: Solar Execution (fire + death combos)
+- Bastet + Thoth: Wise Protection (dodge + cooldown)
+
+LegendaryBoons.gd:
+- Ra's Eclipse: Massive AOE at low health
+- Bastet's Nine Lives: Multiple Death Defiances
+- Thoth's Omniscience: See all secrets/synergies
+- Anubis's Final Judgment: Execute any enemy below 50%
+
+BoonEvolution.gd:
+- Upgrade existing boons with Divine Essence
+- Pom of Power equivalent system
+- Visual evolution of boon effects
+- Tier 5 boons become game-breaking
+
+SynergySystem.gd Advanced:
+- 50+ unique synergy combinations
+- Visual indicators for available synergies
+- Synergy discovery achievements
+- Build diversity metrics tracking
+
+BALANCE TARGET:
+- 100+ viable build combinations
+- No single dominant strategy
+- Late-game builds feel godlike
+- Early game accessible to newcomers"
+```
+
+## ⚡ SPRINT 12: JUICE & FEEDBACK SYSTEMS
+**Hades-Level Combat Feel**
+
+### Para Claude Code (Sessão 12):
+```
+"Polish combat feedback to Hades standards:
+
+CombatJuice.gd:
+- Screen shake system (configurable intensity)
+- Hit pause/freeze frames (0.1s for normal, 0.2s for crits)
+- Particle systems for every impact
+- Camera punch effects
+- Time dilation on killing blows
+
+AudioFeedback.gd:
+- Dynamic audio layers (combat intensity)
+- Spatial 3D audio for impacts
+- Weapon-specific sound signatures
+- Egyptian instrument samples
+
+VisualFeedback.gd:
+- Damage numbers with physics (bounce, fade)
+- Status effect visual indicators
+- Combo counter with satisfying animations
+- Critical hit visual explosion
+- Divine power VFX when using abilities
+
+CombatFlow.gd:
+- Attack canceling into dash (frame-perfect)
+- Combo timing windows (musical rhythm)
+- Animation priorities system
+- Input buffering for responsiveness
+
+FEEL TARGETS:
+- Each hit feels impactful and weighty
+- 60fps never drops during max chaos
+- Audio-visual feedback loop creates flow state
+- Combat rhythm feels musical/dance-like"
+```
+
+## ⚡ SPRINT 13: STATUS EFFECTS & ADVANCED COMBAT
+**Complete Combat Complexity**
+
+### Para Claude Code (Sessão 13):
+```
+"Add Hades combat depth:
+
+StatusEffectSystem.gd:
+- Burn: DOT fire damage (Ra domain)
+- Chill: Slow movement (opposite of solar heat)
+- Weak: Reduced damage output
+- Charmed: Enemies fight each other
+- Doom: Delayed massive damage (Anubis)
+- Blessed: Temporary divine protection (Bastet)
+
+AdvancedCombat.gd:
+- Backstab damage (150% from behind)
+- Wall slam damage (knockback into walls)
+- Deflect system (projectile reflection)
+- Armor system (yellow health bars on elites)
+- Critical hit variations per weapon
+
+CombatEnvironment.gd:
+- Environmental kills (knock into lava)
+- Destructible objects
+- Interactive hazards
+- Dynamic lighting during combat
+- Arena-specific mechanics
+
+EliteEnemies.gd:
+- Armored variants of all enemy types
+- Elite-specific abilities
+- Immunity to certain status effects
+- Enhanced AI coordination
+- Better rewards"
+```
+
+## ⚡ SPRINT 14-15: BOSS EVOLUTION
+**Narrative-Driven Boss Encounters**
+
+### Para Claude Code (Sessões 14-15):
+```
+"Upgrade boss battles to Hades standards:
+
+Multi-Phase Bosses (Sprint 14):
+- Each boss: 4 distinct phases
+- Dialogue during combat (voice lines)
+- Environmental integration
+- Player choice consequences visible
+
+Khaemwaset Enhanced:
+- Phase 1: Reveal conspiracy basics
+- Phase 2: Set's corruption evident
+- Phase 3: Player moral choice impacts fight
+- Phase 4: Consequence of player's path
+
+Boss Mechanics (Sprint 15):
+- Environmental attacks (arena destruction)
+- Temporary mechanics per phase
+- Vulnerability windows
+- Unique mechanics per boss
+- Story revelation through gameplay
+
+NARRATIVE FOCUS:
+- Bosses are people Khenti knew in life
+- Each boss reveals conspiracy details
+- Player choices in hub affect boss dialogue
+- Boss defeats unlock memory fragments"
+```
+
+## ⚡ SPRINT 16-18: META-PROGRESSION COMPLETE
+**House of Hades → Duat Hub Systems**
+
+### Para Claude Code (Sessões 16-18):
+```
+"Complete meta-progression systems:
+
+DuatHub.gd (Sprint 16):
+- 10+ NPCs with evolving relationships
+- Gift system (Soul Essence → relationships)
+- Hub upgrades (cosmetic + functional)
+- Training area for testing builds
+
+RelationshipSystem.gd (Sprint 17):
+- Nefertari: Romantic subplot, motivation keeper
+- Thoth: Mentor, provides wisdom/hints
+- Family spirits: Guilt/forgiveness arcs
+- Conspirators: Confrontation dialogue trees
+
+ContractorSystem.gd (Sprint 18):
+- Pyramid Builder: Hub improvements
+- Multiple currencies for different upgrades
+- Unlock gates based on story progress
+- Quality of life improvements
+- Cosmetic customization options"
+```
 
 # HADES 1 COMPLETE ANALYSIS - MISSING SYSTEMS ⚠️
 

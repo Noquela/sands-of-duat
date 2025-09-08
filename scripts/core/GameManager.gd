@@ -9,6 +9,9 @@ var room_system: Node
 var combat_system: Node
 var dash_system: Node
 var portal_manager: Node
+var reward_system: Node
+var boon_system: Node
+var synergy_system: Node
 
 # Room tracking
 var enemies_in_current_room: Array[Node] = []
@@ -22,6 +25,9 @@ func _ready():
 	combat_system = get_node("/root/CombatSystem")
 	dash_system = get_node("/root/DashSystem")
 	portal_manager = get_node("/root/PortalManager")
+	reward_system = get_node("/root/RewardSystem")
+	boon_system = get_node("/root/BoonSystem")
+	synergy_system = get_node("/root/BoonSynergySystem")
 	
 	# Connect room system signals
 	if room_system:
@@ -33,6 +39,24 @@ func _ready():
 	if portal_manager:
 		portal_manager.portal_selected.connect(_on_portal_selected)
 		print("🔗 GameManager connected to PortalManager")
+	
+	# Connect reward system signals
+	if reward_system:
+		reward_system.reward_collected.connect(_on_reward_collected)
+		print("🔗 GameManager connected to RewardSystem")
+	
+	# Connect boon system signals
+	if boon_system:
+		boon_system.boon_offered.connect(_on_boons_offered)
+		boon_system.boon_selected.connect(_on_boon_selected)
+		boon_system.boon_applied.connect(_on_boon_applied)
+		print("🔗 GameManager connected to BoonSystem")
+	
+	# Connect synergy system signals
+	if synergy_system:
+		synergy_system.synergy_activated.connect(_on_synergy_activated)
+		synergy_system.synergy_deactivated.connect(_on_synergy_deactivated)
+		print("🔗 GameManager connected to BoonSynergySystem")
 	
 	# Setup initial room
 	_setup_current_room()
@@ -102,6 +126,9 @@ func _clear_current_room():
 	if room_system:
 		room_system.clear_current_room()
 	
+	# Generate rewards for cleared room
+	_generate_room_rewards()
+	
 	# Show door selection UI
 	_show_door_selection_ui()
 
@@ -167,3 +194,126 @@ func _test_spawn_portals():
 		portal_manager.force_spawn_test_portals()
 	else:
 		print("❌ PortalManager not available for testing")
+
+# ========== SPRINT 7: REWARD & BOON SYSTEM HANDLERS ==========
+
+func _on_reward_collected(reward_type: int, amount: int, data: Dictionary):
+	"""Handle reward collection"""
+	print("🏺 GameManager: Reward collected - Type %d, Amount %d" % [reward_type, amount])
+	
+	# Update UI if needed
+	_update_currency_ui()
+
+func _on_boons_offered(boon_options: Array):
+	"""Handle boons being offered to player"""
+	print("🏺 GameManager: %d boons offered to player" % boon_options.size())
+	
+	# Show boon selection UI
+	_show_boon_selection_ui(boon_options)
+
+func _on_boon_selected(boon_data: Dictionary):
+	"""Handle boon selection by player"""
+	print("🏺 GameManager: Player selected boon: %s" % boon_data.name)
+	
+	# Update UI to show new boon
+	_update_boon_ui()
+
+func _on_boon_applied(boon_data: Dictionary):
+	"""Handle boon being applied to player"""
+	print("✨ GameManager: Boon applied: %s from %s" % [boon_data.name, boon_data.god_name])
+	
+	# Show boon acquisition feedback
+	_show_boon_feedback(boon_data)
+
+func _on_synergy_activated(synergy_data: Dictionary):
+	"""Handle synergy activation"""
+	print("🔮 GameManager: Synergy activated: %s" % synergy_data.name)
+	
+	# Show synergy activation feedback
+	_show_synergy_feedback(synergy_data)
+
+func _on_synergy_deactivated(synergy_data: Dictionary):
+	"""Handle synergy deactivation"""
+	print("🔮 GameManager: Synergy deactivated: %s" % synergy_data.name)
+
+func _show_boon_selection_ui(boon_options: Array):
+	"""Display boon selection interface"""
+	# Get boon selection UI from the current scene
+	var boon_ui = get_tree().get_first_node_in_group("boon_ui")
+	if not boon_ui:
+		# Try alternate paths
+		boon_ui = get_node_or_null("/root/GameScene/UI/BoonSelectionUI")
+		if not boon_ui:
+			boon_ui = get_tree().current_scene.get_node_or_null("UI/BoonSelectionUI")
+		
+	if not boon_ui:
+		print("⚠️ GameManager: BoonSelectionUI not found in scene!")
+		print("   Searching for UI in current scene tree...")
+		_debug_find_boon_ui()
+		return
+	
+	# The UI will handle the display automatically via signal connection
+	print("🏺 GameManager: Boon selection UI found and should now be visible")
+
+func _show_boon_feedback(boon_data: Dictionary):
+	"""Show feedback when boon is acquired"""
+	print("✨ BOON ACQUIRED: %s" % boon_data.name)
+	print("   %s" % boon_data.description)
+	print("   From: %s (%s)" % [boon_data.god_name, boon_data.rarity_data.name])
+
+func _show_synergy_feedback(synergy_data: Dictionary):
+	"""Show feedback when synergy is activated"""
+	print("🔮 SYNERGY ACTIVATED: %s" % synergy_data.name)
+	print("   %s" % synergy_data.description)
+
+func _update_currency_ui():
+	"""Update currency display in UI"""
+	# TODO: Update UI currency displays when UI system is implemented
+	pass
+
+func _update_boon_ui():
+	"""Update boon display in UI"""
+	# TODO: Update UI boon displays when UI system is implemented
+	pass
+
+# ========== SPRINT 7: INTEGRATION WITH ROOM REWARDS ==========
+
+func _generate_room_rewards():
+	"""Generate rewards for current room based on type and difficulty"""
+	if not room_system or not reward_system:
+		print("⚠️ GameManager: Missing systems for reward generation")
+		return
+	
+	var current_room = room_system.get_current_room()
+	if current_room.is_empty():
+		print("⚠️ GameManager: No current room data for reward generation")
+		return
+	
+	# Only generate automatic rewards for combat/elite rooms
+	# Treasure rooms handle boons separately
+	var room_type_key = RoomSystem.RoomType.keys()[current_room.type]
+	if room_type_key == "TREASURE":
+		print("🏺 GameManager: Treasure room - boons handled separately")
+		return
+	
+	# Generate reward for cleared combat/elite room
+	var reward_data = reward_system.generate_room_reward(current_room)
+	print("🏺 GameManager: Generated reward: %s" % reward_data.name)
+	
+	# Apply the reward immediately (or store for collection)
+	reward_system.collect_reward(reward_data)
+
+func _debug_find_boon_ui():
+	"""Debug function to find BoonSelectionUI in scene tree"""
+	var scene = get_tree().current_scene
+	print("🔍 Debug: Current scene is: %s" % scene.name)
+	
+	var ui_node = scene.get_node_or_null("UI")
+	if ui_node:
+		print("🔍 Debug: Found UI node with %d children" % ui_node.get_child_count())
+		for child in ui_node.get_children():
+			print("🔍 Debug: UI child: %s" % child.name)
+			if "BoonSelectionUI" in child.name:
+				print("✅ Debug: Found BoonSelectionUI at %s" % child.get_path())
+	else:
+		print("❌ Debug: No UI node found in scene")

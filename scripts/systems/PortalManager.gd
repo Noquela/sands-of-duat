@@ -79,6 +79,11 @@ func _spawn_portal(door_index: int, door_data: Dictionary):
 	var room_template = current_room.get("template", {})
 	room_size = room_template.get("size", Vector2(20, 20))
 	
+	print("🚪 Portal %d positioning debug:" % door_index)
+	print("   Current room: %s" % room_template.get("name", "Unknown"))
+	print("   Room size: %s" % room_size)
+	print("   Wall offset: %s" % portal_wall_offset)
+	
 	# Calculate wall positions based on room size
 	var half_height = room_size.y / 2.0
 	
@@ -95,6 +100,9 @@ func _spawn_portal(door_index: int, door_data: Dictionary):
 		portal_height,
 		-half_height + portal_wall_offset  # At room boundary
 	)
+	
+	print("   Calculated position: %s" % spawn_pos)
+	print("   Half height: %s, Start offset: %s" % [half_height, start_offset])
 	
 	# Create portal instance
 	var portal = RoomPortal.instantiate()

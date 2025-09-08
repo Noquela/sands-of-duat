@@ -24,6 +24,9 @@ CombatSystem="*res://scripts/combat/CombatSystem.gd"
 DashSystem="*res://scripts/systems/DashSystem.gd"
 RoomSystem="*res://scripts/systems/RoomSystem.gd"
 PortalManager="*res://scripts/systems/PortalManager.gd"
+RewardSystem="*res://scripts/systems/RewardSystem.gd"
+BoonSystem="*res://scripts/systems/BoonSystem.gd"
+BoonSynergySystem="*res://scripts/systems/BoonSynergySystem.gd"
 
 [display]
 
@@ -116,6 +119,11 @@ interact={
 test_portals={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":80,"key_label":0,"unicode":112,"location":0,"echo":false,"script":null)
+]
+}
+test_boon_selection={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194337,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
 
