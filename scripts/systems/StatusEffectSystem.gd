@@ -3,7 +3,6 @@
 # Implements Burn, Chill, Weak, Vulnerable, and Egyptian-themed effects
 
 extends Node
-class_name StatusEffectSystem
 
 # Status effect types with Egyptian theming
 enum StatusType {

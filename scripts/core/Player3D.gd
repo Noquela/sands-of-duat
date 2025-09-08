@@ -25,8 +25,15 @@ var movement_vector: Vector3
 var combat_system: Node
 var dash_system: Node
 var ability_system: AbilitySystem
+var status_effect_system: Node
 var is_invulnerable: bool = false
 var invulnerability_timer: float = 0.0
+
+# Combat feedback system
+var screen_shake_strength: float = 0.0
+var screen_shake_duration: float = 0.0
+var hit_freeze_duration: float = 0.0
+var hit_freeze_timer: float = 0.0
 
 # Shield system (for Divine Shield ability)
 var shield_active: bool = false
@@ -50,6 +57,12 @@ func _ready():
 		print("⚠️ Dash system not found!")
 	else:
 		print("🏃 Dash system connected")
+	
+	status_effect_system = get_node("/root/StatusEffectSystem")
+	if not status_effect_system:
+		print("⚠️ Status effect system not found!")
+	else:
+		print("⚡ Status effect system connected")
 	
 	# Setup ability system
 	ability_system = AbilitySystem.new()
@@ -82,6 +95,20 @@ func _physics_process(delta):
 		invulnerability_timer -= delta
 		if invulnerability_timer <= 0:
 			is_invulnerable = false
+	
+	# Handle hit freeze (for impact feedback)
+	if hit_freeze_timer > 0:
+		hit_freeze_timer -= delta
+		if hit_freeze_timer <= 0:
+			Engine.time_scale = 1.0  # Resume normal time
+		else:
+			Engine.time_scale = 0.1  # Slow motion effect
+			return  # Skip normal physics during hit freeze
+	
+	# Handle screen shake
+	if screen_shake_duration > 0:
+		screen_shake_duration -= delta
+		_apply_screen_shake()
 	
 	# Handle gravity
 	if not is_on_floor():
@@ -160,7 +187,12 @@ func _apply_movement(_delta):
 	# For isometric view, we map:
 	# Input X -> World X
 	# Input Y -> World Z (depth)
-	movement_vector = Vector3(input_vector.x, 0, input_vector.y) * SPEED
+	
+	# Apply movement speed modifier from status effects
+	var speed_multiplier = get_movement_speed_multiplier()
+	var effective_speed = SPEED * speed_multiplier
+	
+	movement_vector = Vector3(input_vector.x, 0, input_vector.y) * effective_speed
 	
 	# Apply to velocity (keeping Y for gravity)
 	velocity.x = movement_vector.x
@@ -315,11 +347,18 @@ func take_damage(amount: int, damage_type: String = "physical"):
 	
 	var final_damage = amount
 	
+	# Apply status effect damage modifiers
+	if status_effect_system and status_effect_system.has_method("get_damage_taken_multiplier"):
+		final_damage = int(final_damage * status_effect_system.get_damage_taken_multiplier(self))
+	
 	# Apply shield reduction (Sprint 5: Divine Shield)
 	if shield_active:
-		final_damage = int(amount * (1.0 - shield_damage_reduction))
+		final_damage = int(final_damage * (1.0 - shield_damage_reduction))
 		var blocked_damage = amount - final_damage
 		print("🛡️ Divine shield blocks %d damage! (%d → %d)" % [blocked_damage, amount, final_damage])
+	
+	# Apply screen shake and hit freeze for impact feedback
+	_trigger_hit_feedback(final_damage)
 	
 	if health_system and health_system.has_method("take_damage"):
 		health_system.take_damage(final_damage, damage_type)
@@ -345,6 +384,79 @@ func _on_player_death():
 	# Handle player death - respawn, game over, etc.
 	# For Sprint 3, just print message
 	
+# Combat polish methods (Sprint 8)
+func _trigger_hit_feedback(damage: float):
+	"""Trigger screen shake and hit freeze based on damage"""
+	# Screen shake intensity scales with damage
+	var shake_intensity = min(damage * 0.02, 0.8)  # Cap at 0.8 for extreme hits
+	var shake_time = min(damage * 0.01, 0.3)       # Cap at 0.3 seconds
+	
+	screen_shake_strength = shake_intensity
+	screen_shake_duration = shake_time
+	
+	# Hit freeze for big hits (over 25 damage)
+	if damage > 25:
+		hit_freeze_timer = 0.1  # 0.1 second freeze
+		Engine.time_scale = 0.1
+	
+	print("💥 Hit feedback: shake=%.2f, freeze=%s" % [shake_intensity, str(damage > 25)])
+
+func _apply_screen_shake():
+	"""Apply screen shake effect to camera"""
+	var camera = get_viewport().get_camera_3d()
+	if not camera:
+		return
+	
+	# Generate random shake offset
+	var shake_offset = Vector3(
+		randf_range(-screen_shake_strength, screen_shake_strength),
+		randf_range(-screen_shake_strength, screen_shake_strength),
+		0
+	)
+	
+	# Apply to camera position (store original first if needed)
+	if not camera.has_meta("original_position"):
+		camera.set_meta("original_position", camera.position)
+	
+	var original_pos = camera.get_meta("original_position")
+	camera.position = original_pos + shake_offset
+	
+	# Reset position when shake ends
+	if screen_shake_duration <= 0:
+		camera.position = original_pos
+		camera.remove_meta("original_position")
+
+func trigger_screen_shake(intensity: float, duration: float):
+	"""Public method for other systems to trigger screen shake"""
+	screen_shake_strength = intensity
+	screen_shake_duration = duration
+
+func add_status_effect(effect_type, duration: float, intensity: float = 1.0):
+	"""Apply status effect to player"""
+	if status_effect_system and status_effect_system.has_method("apply_status_effect"):
+		status_effect_system.apply_status_effect(self, effect_type, duration, intensity)
+
+func get_damage_multiplier() -> float:
+	"""Get damage multiplier from status effects and buffs"""
+	var multiplier = 1.0
+	
+	# Add base attack power multiplier
+	var base_power = get_attack_power()
+	if base_power > 0:
+		multiplier += base_power * 0.01  # 1% per attack power point
+	
+	# Apply status effect modifiers
+	if status_effect_system and status_effect_system.has_method("get_damage_multiplier"):
+		multiplier *= status_effect_system.get_damage_multiplier(self)
+	
+	return multiplier
+
+func get_movement_speed_multiplier() -> float:
+	"""Get movement speed multiplier from status effects"""
+	if status_effect_system and status_effect_system.has_method("get_movement_multiplier"):
+		return status_effect_system.get_movement_multiplier(self)
+	return 1.0
+
 # Debug info
 func _input(event):
 	if event is InputEventKey and event.pressed:
@@ -356,3 +468,17 @@ func _input(event):
 				print("   Input: " + str(input_vector))
 				print("   Health: %d/%d" % [get_health(), get_max_health()])
 				print("   On Floor: " + str(is_on_floor()))
+				print("   Damage Multiplier: %.2f" % get_damage_multiplier())
+				print("   Speed Multiplier: %.2f" % get_movement_speed_multiplier())
+			KEY_F3:
+				# Test status effects
+				print("🧪 Testing status effects...")
+				if status_effect_system:
+					status_effect_system.apply_burn(self, 5.0, 1.0)
+					status_effect_system.apply_chill(self, 3.0)
+				else:
+					print("⚠️ No status effect system available")
+			KEY_F4:
+				# Test screen shake
+				print("📱 Testing screen shake...")
+				trigger_screen_shake(0.5, 1.0)

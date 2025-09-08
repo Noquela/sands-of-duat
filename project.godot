@@ -27,6 +27,7 @@ PortalManager="*res://scripts/systems/PortalManager.gd"
 RewardSystem="*res://scripts/systems/RewardSystem.gd"
 BoonSystem="*res://scripts/systems/BoonSystem.gd"
 BoonSynergySystem="*res://scripts/systems/BoonSynergySystem.gd"
+StatusEffectSystem="*res://scripts/systems/StatusEffectSystem.gd"
 
 [display]
 
