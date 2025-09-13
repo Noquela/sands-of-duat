@@ -12,6 +12,7 @@ var portal_manager: Node
 var reward_system: Node
 var boon_system: Node
 var synergy_system: Node
+var enemy_manager: Node
 
 # Room tracking
 var enemies_in_current_room: Array[Node] = []
@@ -28,6 +29,12 @@ func _ready():
 	reward_system = get_node("/root/RewardSystem")
 	boon_system = get_node("/root/BoonSystem")
 	synergy_system = get_node("/root/BoonSynergySystem")
+	
+	# Initialize EnemyManager (Sprint 9)
+	var enemy_manager_script = load("res://scripts/enemies/EnemyManager.gd")
+	enemy_manager = enemy_manager_script.new()
+	enemy_manager.name = "EnemyManager"
+	add_child(enemy_manager)
 	
 	# Connect room system signals
 	if room_system:
@@ -57,6 +64,13 @@ func _ready():
 		synergy_system.synergy_activated.connect(_on_synergy_activated)
 		synergy_system.synergy_deactivated.connect(_on_synergy_deactivated)
 		print("🔗 GameManager connected to BoonSynergySystem")
+	
+	# Connect enemy manager signals (Sprint 9)
+	if enemy_manager:
+		enemy_manager.enemy_spawned.connect(_on_enemy_spawned)
+		enemy_manager.enemy_died.connect(_on_enemy_died_from_manager)
+		enemy_manager.room_cleared.connect(_on_room_cleared_from_enemies)
+		print("🔗 GameManager connected to EnemyManager")
 	
 	# Setup initial room
 	_setup_current_room()
@@ -317,3 +331,39 @@ func _debug_find_boon_ui():
 				print("✅ Debug: Found BoonSelectionUI at %s" % child.get_path())
 	else:
 		print("❌ Debug: No UI node found in scene")
+
+# ========== SPRINT 9: ENEMY MANAGER INTEGRATION ==========
+
+func _on_enemy_spawned(enemy: Node, enemy_type: String):
+	"""Handle enemy spawn from EnemyManager"""
+	print("👹 GameManager: Enemy spawned - %s (%s)" % [enemy.name, enemy_type])
+	
+	# Add to current room tracking
+	if not enemy in enemies_in_current_room:
+		enemies_in_current_room.append(enemy)
+		room_enemies_total += 1
+	
+	# Connect to individual enemy death
+	if enemy.has_signal("enemy_died"):
+		if not enemy.enemy_died.is_connected(_on_enemy_died):
+			enemy.enemy_died.connect(_on_enemy_died)
+
+func _on_enemy_died_from_manager(enemy: Node, enemy_type: String):
+	"""Handle enemy death from EnemyManager"""
+	print("💀 GameManager: Enemy died via EnemyManager - %s (%s)" % [enemy.name, enemy_type])
+	
+	# Remove from room tracking
+	if enemy in enemies_in_current_room:
+		enemies_in_current_room.erase(enemy)
+
+func _on_room_cleared_from_enemies():
+	"""Handle room cleared signal from EnemyManager"""
+	print("✅ GameManager: Room cleared via EnemyManager!")
+	
+	# Use existing room clear logic
+	_clear_current_room()
+
+# Enhanced room entry to integrate with EnemyManager
+func register_system(system: Node):
+	"""Allow systems to register with GameManager"""
+	print("🔗 System registered: %s" % system.name)
